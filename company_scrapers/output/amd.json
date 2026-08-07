@@ -1,0 +1,28 @@
+{
+    "company_name": "AMD",
+    "description": "American multinational semiconductor company",
+    "summary": "Advanced Micro Devices, Inc. (AMD) is an American multinational semiconductor company headquartered in Santa Clara, California. It develops central processing units (CPUs), graphics processing units (GPUs), field-programmable gate arrays (FPGAs), system-on-chips (SoCs), and high-performance computer components. AMD serves a wide range of business and consumer markets, including personal computers (PCs), gaming, data centers, and embedded systems.",
+    "logo_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/2485_Augustine_Drive_headquarters_in_Santa_Clara%2C_California.jpg/330px-2485_Augustine_Drive_headquarters_in_Santa_Clara%2C_California.jpg",
+    "wikipedia_url": "https://en.wikipedia.org/wiki/Advanced_Micro_Devices",
+    "scraped_at": "2026-07-12T10:06:02.664299Z",
+    "details": {
+        "Trade name": "AMD",
+        "Type": "Public",
+        "Traded as": "Nasdaq : AMD Nasdaq-100 component S&P 100 component S&P 500 component",
+        "Industry": "Semiconductors Computer hardware",
+        "Founded": "May 1, 1969 ; 57 years ago ( 1969-05-01 )",
+        "Founder": "Team led by Jerry Sanders",
+        "Headquarters": "Santa Clara, California , U.S",
+        "Area served": "Worldwide",
+        "Key people": "Lisa Su ( chair & CEO ) Mark Papermaster ( CTO ) Jean Hu ( CFO ) Phil Guido ( CCO )",
+        "Products": "AMD CPUs AMD GPUs AMD FPGAs",
+        "Brands": "Ryzen Radeon Athlon Epyc Threadripper Virtex Vivado Sempron Duron AMD Instinct",
+        "Revenue": "US$34.6 billion (2025)",
+        "Operating income": "US$3.69 billion (2025)",
+        "Net income": "US$4.34 billion (2025)",
+        "Total assets": "US$76.9 billion (2025)",
+        "Total equity": "US$63.0 billion (2025)",
+        "Number of employees": "c. 31,000 (2025)",
+        "Website": "amd.com"
+    }
+}

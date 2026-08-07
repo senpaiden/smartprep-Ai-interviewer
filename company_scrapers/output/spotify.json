@@ -1,0 +1,31 @@
+{
+    "company_name": "Spotify",
+    "description": "Swedish audio streaming service",
+    "summary": "Spotify is a Swedish freemium music streaming service provider founded in April 2006 by Daniel Ek and Martin Lorentzon. As of March 2026, it was one of the largest providers of music streaming services, with over 761 million monthly active users comprising 293 million paying subscribers. Spotify is listed on the New York Stock Exchange in the form of American depositary receipts.",
+    "logo_url": "",
+    "wikipedia_url": "https://en.wikipedia.org/wiki/Spotify",
+    "scraped_at": "2026-07-12T10:07:18.337308Z",
+    "details": {
+        "Type of business": "Public",
+        "Traded as": "NYSE : SPOT Russell 1000 component",
+        "Founded": "23 April 2006 ; 20 years ago ( 2006-04-23 )",
+        "Headquarters": "Luxembourg , Luxembourg (registered) Stockholm , Sweden (operational)",
+        "Country of origin": "Sweden",
+        "No. of locations": "15 offices",
+        "Area served": "Worldwide (except blocked countries)",
+        "Founders": "Daniel Ek Martin Lorentzon",
+        "Key people": "Daniel Ek (executive chairman) Alex Norström (co-CEO) Gustav Söderström (co-CEO)",
+        "Industry": "Audio streaming Podcasting",
+        "Revenue": "€15.67 billion (2024)",
+        "Operating income": "€1.365 billion (2024)",
+        "Net income": "€4.5 billion (2025)",
+        "Total assets": "€12.01 billion (2024)",
+        "Total equity": "€5.525 billion (2024)",
+        "Employees": "7,258 (March 2026)",
+        "Subsidiaries": "Spotify AB : 38 Spotify USA Inc. : 38 Spotify Ltd (UK) : 38 Several other regional subsidiaries : 38",
+        "URL": "spotify .com",
+        "Registration": "Required",
+        "Users": "Free : 483 million Paying : 293 million Total ( MAU ) : 761 million (March 2026 )",
+        "Launched": "7 October 2008 ; 17 years ago ( 2008-10-07 )"
+    }
+}

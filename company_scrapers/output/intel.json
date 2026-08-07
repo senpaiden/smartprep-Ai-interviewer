@@ -1,0 +1,28 @@
+{
+    "company_name": "Intel",
+    "description": "American multinational technology company",
+    "summary": "Intel Corporation is an American multinational technology company headquartered in Santa Clara, California. It designs, manufactures, and sells computer components such as central processing units (CPUs) and related products for business and consumer markets. Intel was the world's third-largest semiconductor chip manufacturer by revenue in 2024 and has been included in the Fortune 500 list of the largest United States corporations by revenue since 2007. It was one of the first companies listed on Nasdaq.",
+    "logo_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Intel_Headquarters_in_2023.jpg/330px-Intel_Headquarters_in_2023.jpg",
+    "wikipedia_url": "https://en.wikipedia.org/wiki/Intel",
+    "scraped_at": "2026-07-12T10:06:38.550836Z",
+    "details": {
+        "Trade name": "Intel",
+        "Formerly": "NM Electronics (1968)",
+        "Type": "Public",
+        "Traded as": "Nasdaq : INTC Nasdaq-100 component S&P 100 component S&P 500 component",
+        "Industry": "Semiconductors",
+        "Founded": "July 18, 1968 ; 57 years ago ( 1968-07-18 )",
+        "Founders": "Robert Noyce Gordon Moore",
+        "Headquarters": "Santa Clara, California , U.S. , 37°23′16″N 121°57′49″W ﻿ / ﻿ 37.38778°N 121.96361°W ﻿ / 37.38778; -121.96361",
+        "Area served": "Worldwide",
+        "Key people": "Frank D. Yeary ( chairman ) Lip-Bu Tan ( CEO ) David Zinsner ( CFO )",
+        "Revenue": "US$52.85 billion (2025)",
+        "Operating income": "US$−2.21 billion (2025)",
+        "Net income": "US$−267 million (2025)",
+        "Total assets": "US$211.4 billion (2025)",
+        "Total equity": "US$114.3 billion (2025)",
+        "Number of employees": "85,100 (2025)",
+        "Subsidiaries": "Mobileye (94.2%) Intel Ireland",
+        "Website": "intel.com"
+    }
+}

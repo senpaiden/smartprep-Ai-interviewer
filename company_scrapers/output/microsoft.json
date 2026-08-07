@@ -1,0 +1,33 @@
+{
+    "company_name": "Microsoft",
+    "description": "American multinational technology company",
+    "summary": "Microsoft Corporation is an American multinational technology company headquartered in Redmond, Washington. The company became influential in the rise of personal computers through software like Windows and has since expanded into areas such as Internet services, cloud computing, artificial intelligence, video gaming, and more. A Big Tech company, Microsoft is the largest software company by revenue, one of the most valuable public companies, and one of the most valuable brands globally.",
+    "logo_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Aerial_Microsoft_West_Campus_August_2009.jpg/330px-Aerial_Microsoft_West_Campus_August_2009.jpg",
+    "wikipedia_url": "https://en.wikipedia.org/wiki/Microsoft",
+    "scraped_at": "2026-07-12T10:06:49.100197Z",
+    "details": {
+        "Type": "Public",
+        "Traded as": "Nasdaq : MSFT Nasdaq-100 component DJIA component S&P 100 component S&P 500 component",
+        "ISIN": "US5949181045",
+        "Industry": "Information technology",
+        "Predecessor": "Traf-O-Data",
+        "Founded": "April 4, 1975 ; 51 years ago ( 1975-04-04 ) in Albuquerque, New Mexico , U.S",
+        "Founders": "Bill Gates Paul Allen",
+        "Headquarters": "Microsoft campus, Redmond, Washington , U.S",
+        "Area served": "Worldwide",
+        "Key people": "Satya Nadella ( chairman and CEO ) Brad Smith ( vice chairman and president ) Bill Gates ( technical adviser ) Amy Hood ( CFO )",
+        "Products": "Software development Computer hardware Consumer electronics Social networking service Cloud computing Video games Corporate venture capital",
+        "Brands": "Windows Microsoft 365 Teams Visual Studio Xbox Dynamics Surface",
+        "Services": "Edge Azure Bing LinkedIn Viva Engage Microsoft 365 OneDrive Dynamics 365 Outlook GitHub Microsoft Store Windows Update Game Pass Xbox network",
+        "Revenue": "US$281.7 billion (2025)",
+        "Operating income": "US$128.5 billion (2025)",
+        "Net income": "US$101.8 billion (2025)",
+        "Total assets": "US$619.0 billion (2025)",
+        "Total equity": "US$343.5 billion (2025)",
+        "Number of employees": "228,000 (2025)",
+        "Divisions": "Xbox Microsoft 365 Microsoft Research Microsoft AI Windows and Devices Group Microsoft Cloud Microsoft Security Microsoft Industry Microsoft Business Applications Microsoft Developer",
+        "Subsidiaries": "GitHub LinkedIn",
+        "ASN": "8075",
+        "Website": "microsoft.com"
+    }
+}

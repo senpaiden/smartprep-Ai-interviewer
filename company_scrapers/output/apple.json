@@ -1,0 +1,32 @@
+{
+    "company_name": "Apple",
+    "description": "American multinational technology company",
+    "summary": "Apple Inc. is an American multinational technology company headquartered in Cupertino, California, in Silicon Valley, and known for consumer electronics, software and online services. Founded in 1976 as Apple Computer Company by Steve Jobs, Steve Wozniak and Ronald Wayne, the company was incorporated by Jobs and Wozniak as Apple Computer, Inc. the following year. Its current name was adopted in 2007 as the company expanded its focus from computers to consumer electronics. Apple is one of the Big Tech companies.",
+    "logo_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/330px-Apple_logo_black.svg.png",
+    "wikipedia_url": "https://en.wikipedia.org/wiki/Apple_Inc.",
+    "scraped_at": "2026-07-12T10:06:07.167389Z",
+    "details": {
+        "Formerly": "Apple Computer Company (1976–1977) Apple Computer, Inc. (1977–2007)",
+        "Type": "Public",
+        "Traded as": "Nasdaq : AAPL Nasdaq-100 component DJIA component S&P 100 component S&P 500 component",
+        "ISIN": "US0378331005",
+        "Industry": "Consumer electronics Software services Online services",
+        "Founded": "April 1, 1976 (50 years ago) ( 1976-04-01 ) , in Los Altos, California , US",
+        "Founders": "Steve Jobs Steve Wozniak Ronald Wayne",
+        "Headquarters": "Apple Park, Cupertino, California , US",
+        "Number of locations": "540 Apple Stores (2026)",
+        "Area served": "Worldwide",
+        "Key people": "Arthur Levinson ( chairman ) Tim Cook ( CEO ) John Ternus (CEO-designate, starting September 2026) Sabih Khan ( COO ) Kevan Parekh ( CFO ) Craig Federighi (SVP of software engineering)",
+        "Products": "AirPods AirTag Apple TV Apple Vision Pro Apple Watch HomePod iPad iPhone Mac",
+        "Services": "App Store Apple Arcade Apple Card Apple Music Apple Pay Apple TV CarPlay iCloud Pixelmator Shazam",
+        "Revenue": "US$416 billion (2025)",
+        "Operating income": "US$133 billion (2025)",
+        "Net income": "US$112 billion (2025)",
+        "Total assets": "US$359 billion (2025)",
+        "Total equity": "US$74 billion (2025)",
+        "Number of employees": "166,000 (2025)",
+        "Subsidiaries": "Apple Studios Beats Electronics Beddit Braeburn Capital Claris Globalstar (20%)",
+        "ASN": "714",
+        "Website": "apple.com"
+    }
+}

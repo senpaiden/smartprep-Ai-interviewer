@@ -1,0 +1,25 @@
+{
+    "company_name": "Google",
+    "description": "American multinational technology company",
+    "summary": "Google LLC is an American multinational technology corporation focused on information technology, online advertising, search engine technology, email, cloud computing, software, quantum computing, e-commerce, consumer electronics, and artificial intelligence (AI). It has been referred to as \"the most powerful company in the world\" by the BBC, and is one of the world's most valuable brands. Google's parent company Alphabet Inc. has been described as a Big Tech company.",
+    "logo_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Googleplex_HQ_%28cropped%29.jpg/330px-Googleplex_HQ_%28cropped%29.jpg",
+    "wikipedia_url": "https://en.wikipedia.org/wiki/Google",
+    "scraped_at": "2026-07-12T10:06:18.021699Z",
+    "details": {
+        "Formerly": "Google Inc. (1998–2017)",
+        "Type": "Subsidiary",
+        "Traded as": "Nasdaq : GOOGL Nasdaq : GOOG",
+        "Industry": "Internet Cloud computing Computer software Computer hardware Artificial intelligence Advertising",
+        "Founded": "September 4, 1998 ; 27 years ago ( 1998-09-04 ) in Menlo Park, California , United States",
+        "Founders": "Larry Page Sergey Brin",
+        "Headquarters": "Googleplex , Mountain View, California , United States",
+        "Area served": "Worldwide",
+        "Key people": "John L. Hennessy ( Chairman ) Sundar Pichai ( CEO ) Philipp Schindler ( CBO ) Ruth Porat ( President and CIO ) Anat Ashkenazi ( CFO ) Lorraine Twohill ( CMO )",
+        "Products": "Google Search Android Nest Pixel Workspace Fitbit Waze YouTube Gemini Full list",
+        "Number of employees": "187,000 (2022)",
+        "Parent": "Alphabet Inc",
+        "Subsidiaries": "Cameyo Charleston Road Registry Endoxon FeedBurner ImageAmerica Kaltix Nest Labs reCAPTCHA X Development YouTube ZipDash",
+        "ASN": "15169",
+        "Website": "about .google"
+    }
+}

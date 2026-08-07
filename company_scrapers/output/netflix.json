@@ -1,0 +1,26 @@
+{
+    "company_name": "Netflix",
+    "description": "American video streaming service",
+    "summary": "Netflix is an American subscription video on-demand over-the-top streaming television service. The service primarily distributes original and acquired films and television shows from various genres. It is available internationally in multiple languages.",
+    "logo_url": "https://upload.wikimedia.org/wikipedia/en/thumb/3/3c/Netflix_UI_for_Web.png/330px-Netflix_UI_for_Web.png",
+    "wikipedia_url": "https://en.wikipedia.org/wiki/Netflix",
+    "scraped_at": "2026-07-12T10:06:54.054666Z",
+    "details": {
+        "Type of site": "OTT platform",
+        "Available in": "56 languages",
+        "Headquarters": "Los Gatos, California , US",
+        "Country of origin": "United States",
+        "Area served": "Worldwide (except China, Crimea , North Korea, Russia, and Syria)",
+        "Industry": "Entertainment mass media",
+        "Products": "Streaming television video on demand digital distribution",
+        "Services": "Film production film distribution television production television distribution",
+        "Parent": "Netflix, Inc",
+        "URL": "www .netflix .com",
+        "Commercial": "Yes",
+        "Registration": "Required",
+        "Users": "325 million (as of January 20, 2026 )",
+        "Launched": "April 14, 1998 ; 28 years ago ( 1998-04-14 ) (as a DVD e-commerce) , January 16, 2007 ; 19 years ago ( 2007-01-16 ) (as a streaming service)",
+        "Current status": "Active",
+        "ASN": "2906"
+    }
+}

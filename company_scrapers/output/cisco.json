@@ -1,0 +1,27 @@
+{
+    "company_name": "Cisco",
+    "description": "American multinational technology company",
+    "summary": "Cisco Systems, Inc., doing business as Cisco, is an American multinational technology conglomerate corporation that develops, manufactures, and sells hardware, software, telecommunications equipment and other high-technology services and products focused on networking, cyber security and AI. Cisco specializes in specific tech markets, such as the Internet of things (IoT), domain security, videoconferencing, and energy management, including products such as Webex, OpenDNS, Jabber, and Jasper. The company is headquartered in San Jose, California, and, as of June 29th, 2026, has a market capitalization of $461 billion.",
+    "logo_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Cisco_logo_blue_2016.svg/330px-Cisco_logo_blue_2016.svg.png",
+    "wikipedia_url": "https://en.wikipedia.org/wiki/Cisco",
+    "scraped_at": "2026-07-12T10:06:13.090001Z",
+    "details": {
+        "Type": "Public",
+        "Traded as": "Nasdaq : CSCO Nasdaq-100 component DJIA component S&P 100 component S&P 500 component",
+        "ISIN": "US17275R1023",
+        "Industry": "Networking hardware Networking software",
+        "Founded": "December 10, 1984 ; 41 years ago ( 1984-12-10 ) in San Francisco , California, U.S",
+        "Founders": "Leonard Bosack Sandy Lerner",
+        "Headquarters": "San Jose, California , U.S",
+        "Area served": "Worldwide",
+        "Key people": "Chuck Robbins , ( CEO & chairman )",
+        "Products": "List of Cisco products",
+        "Revenue": "US$ 56.65 billion (2025)",
+        "Operating income": "US$11.76 billion (2025)",
+        "Net income": "US$10.18 billion (2025)",
+        "Total assets": "US$122.3 billion (2025)",
+        "Total equity": "US$46.84 billion (2025)",
+        "Number of employees": "86,200 (2025)",
+        "Website": "cisco .com"
+    }
+}

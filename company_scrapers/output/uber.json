@@ -1,0 +1,28 @@
+{
+    "company_name": "Uber",
+    "description": "American ridesharing and delivery company",
+    "summary": "Uber Technologies, Inc. is an American multinational transportation company that provides ride-hailing services, courier services, food delivery, and freight transport. It is headquartered in San Francisco, California, and operates in approximately 70 countries and 15,000 cities worldwide. It is the largest ridesharing company worldwide with over 202 million monthly active users and 10 million active drivers and couriers. It coordinates an average of 42 million trips and delivery orders per day, and has coordinated 72 billion trips and delivery orders since its inception in 2010. In the fourth quarter of 2025, the company had a take rate of 29.9% for mobility services and 19.2% for food delivery.",
+    "logo_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Uber_offices%2C_Mission_Bay_%28July_2020%29_-2.jpg/330px-Uber_offices%2C_Mission_Bay_%28July_2020%29_-2.jpg",
+    "wikipedia_url": "https://en.wikipedia.org/wiki/Uber",
+    "scraped_at": "2026-07-12T10:07:31.990887Z",
+    "details": {
+        "Formerly": "Ubercab (2009–2011)",
+        "Type": "Public",
+        "Traded as": "NYSE : UBER DJTA component S&P 100 component S&P 500 component",
+        "Industry": "Transportation Mobility as a service",
+        "Founded": "March 2009 ; 17 years ago ( 2009-03 )",
+        "Founders": "Garrett Camp Travis Kalanick",
+        "Headquarters": "1725 3rd St. San Francisco , California, United States",
+        "Area served": "70 countries and 10,500 cities worldwide",
+        "Key people": "Ronald Sugar ( chairman ) Dara Khosrowshahi ( CEO )",
+        "Services": "Taxi Food delivery Package delivery Freight transport",
+        "Revenue": "US$ 52.017 billion (2025)",
+        "Operating income": "US$5.565 billion (2025)",
+        "Net income": "US$10.053 billion (2025)",
+        "Total assets": "US$61.802 billion (2025)",
+        "Total equity": "US$27.041 billion (2025)",
+        "Number of employees": "34,000 (2025)",
+        "Subsidiaries": "Careem (2020–2023) Cornershop Drizly (2021–2024) Postmates Uber Carshare (2022–2024) Uber Eats",
+        "Website": "uber .com"
+    }
+}

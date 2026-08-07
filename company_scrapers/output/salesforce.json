@@ -1,0 +1,28 @@
+{
+    "company_name": "Salesforce",
+    "description": "American software company",
+    "summary": "Salesforce, Inc., is an American cloud-based software company headquartered in San Francisco, California. It is primarily known for its customer relationship management software and related applications which it delivers through a software as a service subscription business model. It also provides software for sales, customer service, marketing automation, e-commerce, analytics, artificial intelligence, agentic AI, and application development.",
+    "logo_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Salesforce.com_logo.svg/330px-Salesforce.com_logo.svg.png",
+    "wikipedia_url": "https://en.wikipedia.org/wiki/Salesforce",
+    "scraped_at": "2026-07-12T10:07:07.490232Z",
+    "details": {
+        "Formerly": "Salesforce.com, Inc. (1999–2022)",
+        "Type": "Public",
+        "Traded as": "NYSE : CRM DJIA component S&P 100 component S&P 500 component",
+        "Industry": "Cloud computing Enterprise software Consulting Artificial intelligence Business software Software as a service",
+        "Founded": "March 8, 1999 ; 27 years ago ( 1999-03-08 )",
+        "Founders": "Marc Benioff Parker Harris Dave Moellenhoff Frank Dominguez",
+        "Headquarters": "Salesforce Tower , San Francisco , California, U.S",
+        "Key people": "Marc Benioff , ( chairman & CEO) Parker Harris (CTO)",
+        "Services": "Cloud computing",
+        "Revenue": "US$ 41.525 billion (2026)",
+        "Operating income": "US$8.331 billion (2026)",
+        "Net income": "US$7.457 billion (2026)",
+        "Total assets": "US$112.305 billion (2026)",
+        "Total equity": "US$59.142 billion (2026)",
+        "Number of employees": "83,334 (2026)",
+        "Subsidiaries": "Quip Heroku MuleSoft Tableau Software Acumen Solutions Slack Technologies Informatica",
+        "ASN": "14340",
+        "Website": "salesforce.com"
+    }
+}

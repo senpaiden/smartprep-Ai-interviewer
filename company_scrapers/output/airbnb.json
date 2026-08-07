@@ -1,0 +1,28 @@
+{
+    "company_name": "Airbnb",
+    "description": "Online platform for short-term housing rentals",
+    "summary": "Airbnb, Inc. is an American company operating an online marketplace for short-and-long-term homestays, experiences and services in various countries and regions. It acts as a broker and charges a commission from each booking. Airbnb was founded in 2008 by Brian Chesky, Nathan Blecharczyk, and Joe Gebbia.",
+    "logo_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/888_Brannan%2C_San_Francisco%2C_2016.jpg/330px-888_Brannan%2C_San_Francisco%2C_2016.jpg",
+    "wikipedia_url": "https://en.wikipedia.org/wiki/Airbnb",
+    "scraped_at": "2026-07-12T10:05:54.051814Z",
+    "details": {
+        "Type": "Public",
+        "Traded as": "Nasdaq : ABNB (Class A) Nasdaq-100 component S&P 500 component",
+        "Industry": "Lodging",
+        "Founded": "August 2008 ; 17 years ago ( 2008-08 ) in San Francisco , California, U.S",
+        "Founders": "Brian Chesky Joe Gebbia Nathan Blecharczyk",
+        "Headquarters": "San Francisco , California, U.S",
+        "Area served": "Worldwide",
+        "Key people": "Brian Chesky ( CEO ) Nathan Blecharczyk ( CSO )",
+        "Services": "Lodging Hospitality Homestay",
+        "Revenue": "US$ 12.2 billion (2025)",
+        "Operating income": "US$2.54 billion (2025)",
+        "Net income": "US$2.51 billion (2025)",
+        "Total assets": "US$22.2 billion (2025)",
+        "Total equity": "US$8.20 billion (2025)",
+        "Owner": "Brian Chesky (10.7% economic; 31.9% voting) Nathan Blecharczyk (9.9% economic; 31.1% voting) Joe Gebbia (5.6% economic; 17.6% voting)",
+        "Number of employees": "8,200 (2025)",
+        "Subsidiaries": "Luxury Retreats International Inc. Tilt.com Accomable Aibiying Trooly, Inc. Deco Software Inc. Trip4real Experiences, S.L. Larson8, Inc. MarketLog, Randorphire Inc. HotelTonight",
+        "Website": "airbnb.com"
+    }
+}

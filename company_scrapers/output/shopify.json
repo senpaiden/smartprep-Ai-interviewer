@@ -1,0 +1,26 @@
+{
+    "company_name": "Shopify",
+    "description": "Canadian e-commerce company",
+    "summary": "Shopify Inc. is a Canadian multinational e-commerce company headquartered in Ottawa, Ontario that operates a cloud e-commerce management platform (CEMP) for retail point-of-sale systems. The company has over 5 million customers and processed US$292.3 billion in transactions in 2024, of which 57% was in the United States. Major customers include Tesla, LVMH, Nestlé, PepsiCo, AB InBev, Kraft Heinz, Lindt, Whole Foods Market, Red Bull, and Hyatt.",
+    "logo_url": "",
+    "wikipedia_url": "https://en.wikipedia.org/wiki/Shopify",
+    "scraped_at": "2026-07-12T10:07:13.599616Z",
+    "details": {
+        "Type": "Public",
+        "Traded as": "TSX : SHOP (Class A) S&P/TSX 60 component Nasdaq : SHOP Nasdaq-100 component",
+        "ISIN": "CA82509L1076",
+        "Industry": "E-commerce",
+        "Founded": "2006 ; 20 years ago ( 2006 ) , Ottawa , Ontario, Canada",
+        "Founders": "Tobias Lütke Daniel Weinand Scott Lake",
+        "Headquarters": "Ottawa, Ontario , Canada",
+        "Key people": "Tobias Lütke (CEO) Harley Finkelstein (president)",
+        "Services": "Online shopping",
+        "Revenue": "US$ 11.6 billion (2025)",
+        "Operating income": "US$1.47 billion (2025)",
+        "Net income": "US$1.23 billion (2025)",
+        "Total assets": "US$15.2 billion (2025)",
+        "Total equity": "US$13.5 billion (2025)",
+        "Number of employees": "7,600 (2025)",
+        "Website": "shopify.com"
+    }
+}
