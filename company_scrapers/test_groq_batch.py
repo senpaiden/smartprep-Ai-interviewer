@@ -3,7 +3,7 @@ import json
 from groq import Groq
 from dotenv import load_dotenv
 
-load_dotenv('server/.env')
+load_dotenv(os.path.join(os.path.dirname(__file__), '..', 'server', '.env'))
 client = Groq(api_key=os.getenv('GROQ_API_KEY'))
 
 def test_batch():

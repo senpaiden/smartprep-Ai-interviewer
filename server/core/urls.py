@@ -13,7 +13,7 @@ urlpatterns = [
     path('api/interviews/', include('interviews.urls')),
     path('api/notifications/', include('notifications.urls')),
     path('api/coding/', include('coding.urls')),
-    path('api/admin/', include('accounts.admin_urls')),
+    path('api/interview/', include('hackathon.urls')),
 ]
 
 if settings.DEBUG:

@@ -11,7 +11,7 @@ import {
 } from 'recharts';
 import { useAuthStore } from '@/stores/authStore';
 import api from '@/lib/api';
-import type { InterviewStats } from '@/types';
+import type { InterviewStats, Interview, Certificate } from '@/types';
 
 import { Card } from '@/components/ui/Card';
 import { Btn } from '@/components/ui/Btn';
@@ -23,9 +23,11 @@ export default function DashboardPage() {
   const user = useAuthStore((s) => s.user);
   const [stats, setStats] = useState<InterviewStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [upcomingInterviews, setUpcomingInterviews] = useState<Interview[]>([]);
+  const [recentCertificates, setRecentCertificates] = useState<Certificate[]>([]);
 
   useEffect(() => {
-    api.get('/interviews/stats/')
+    api.get('/users/dashboard/')
       .then((res) => setStats(res.data))
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -33,6 +35,16 @@ export default function DashboardPage() {
     // Fetch user data
     api.get('/users/me/')
       .then((res) => useAuthStore.getState().setUser(res.data))
+      .catch(() => {});
+
+    // Fetch upcoming in-progress interviews
+    api.get('/interviews/me/?status=in_progress')
+      .then((res) => setUpcomingInterviews(res.data || []))
+      .catch(() => {});
+
+    // Fetch recent certificates
+    api.get('/interviews/certificates/')
+      .then((res) => setRecentCertificates((res.data || []).slice(0, 3)))
       .catch(() => {});
   }, []);
 
@@ -63,7 +75,7 @@ export default function DashboardPage() {
         </div>
         <p className="text-indigo-200 text-sm mb-1">{greeting()}</p>
         <h2 className="text-2xl font-extrabold text-white mb-2">Welcome back, {user?.first_name || user?.username || 'User'}! 👋</h2>
-        <p className="text-indigo-100 text-sm mb-5 max-w-lg">You've completed {stats?.total_interviews || 0} interviews. Keep the momentum going to land your dream job!</p>
+        <p className="text-indigo-100 text-sm mb-5 max-w-lg">You've completed {stats?.interviews_completed || 0} interviews. Keep the momentum going to land your dream job!</p>
         <div className="flex gap-3 flex-wrap">
           <Btn className="bg-white !text-indigo-600 hover:!bg-indigo-50 shadow-none border-0" onClick={() => navigate("/interviews/setup")}>
             <Play size={16} />Start Interview
@@ -76,10 +88,10 @@ export default function DashboardPage() {
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}
         className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Resume Score" value={stats?.average_score ? `${stats.average_score}/100` : "0/100"} change="+5 this week" icon={<FileText size={20} />} color="blue" />
-        <StatCard label="ATS Score" value={stats?.average_score ? `${stats.average_score}%` : "0%"} change="+3% improved" icon={<Target size={20} />} color="purple" />
-        <StatCard label="Interviews Done" value={`${stats?.total_interviews || 0}`} change="+2 this week" icon={<Bot size={20} />} color="green" />
-        <StatCard label="Avg. Score" value={`${stats?.average_score || 0}`} change="+8.1 pts" icon={<TrendingUp size={20} />} color="orange" />
+        <StatCard label="Resume Score" value={stats?.resume_score || "0/100"} change="Latest" icon={<FileText size={20} />} color="blue" />
+        <StatCard label="ATS Score" value={stats?.ats_score || "0%"} change="Latest" icon={<Target size={20} />} color="purple" />
+        <StatCard label="Interviews Done" value={`${stats?.interviews_completed || 0}`} change="Total" icon={<Bot size={20} />} color="green" />
+        <StatCard label="Overall Rating" value={`${stats?.overall_rating || 0}`} change="Average" icon={<TrendingUp size={20} />} color="orange" />
       </motion.div>
 
       <div className="grid lg:grid-cols-3 gap-6">
@@ -127,19 +139,19 @@ export default function DashboardPage() {
               <Btn variant="ghost" size="sm" onClick={() => navigate("/interviews/setup")}><Plus size={14} />Schedule</Btn>
             </div>
             <div className="space-y-3">
-              {[
-                { title: "Google SWE Mock Interview", time: "Today, 3:00 PM", type: "Technical" },
-                { title: "Meta System Design Round", time: "Tomorrow, 11:00 AM", type: "System Design" },
-                { title: "Behavioral STAR Practice", time: "Jul 5, 2:00 PM", type: "Behavioral" },
-              ].map((u, i) => (
-                <div key={i} className="flex items-center justify-between p-3 bg-muted/40 rounded-xl hover:bg-muted/60 cursor-pointer transition-colors" onClick={() => navigate("/interviews/setup")}>
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-indigo-500/15 flex items-center justify-center"><Calendar size={16} className="text-indigo-500 dark:text-indigo-400" /></div>
-                    <div><p className="font-semibold text-foreground text-sm">{u.title}</p><p className="text-xs text-muted-foreground">{u.time}</p></div>
+              {upcomingInterviews.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-4">No in-progress interviews. Start one now!</p>
+              ) : (
+                upcomingInterviews.slice(0, 3).map((interview) => (
+                  <div key={interview.id} className="flex items-center justify-between p-3 bg-muted/40 rounded-xl hover:bg-muted/60 cursor-pointer transition-colors" onClick={() => navigate(`/interviews/${interview.id}`)}>
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-xl bg-indigo-500/15 flex items-center justify-center"><Calendar size={16} className="text-indigo-500 dark:text-indigo-400" /></div>
+                      <div><p className="font-semibold text-foreground text-sm">{interview.role || interview.interview_type} Interview</p><p className="text-xs text-muted-foreground">{interview.difficulty} difficulty</p></div>
+                    </div>
+                    <Badge color="blue">{interview.questions_answered || 0}/{interview.total_questions}</Badge>
                   </div>
-                  <Badge color="blue">{u.type}</Badge>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </Card>
         </motion.div>
@@ -151,19 +163,19 @@ export default function DashboardPage() {
               <Btn variant="ghost" size="sm" onClick={() => navigate("/interviews")}><Award size={14} className="mr-1" /> View all</Btn>
             </div>
             <div className="space-y-3">
-              {[
-                { title: "Google SWE Interview Prep", score: 91, date: "Jun 28, 2025" },
-                { title: "System Design Mastery", score: 87, date: "Jun 22, 2025" },
-                { title: "Behavioral Expert", score: 94, date: "Jun 15, 2025" },
-              ].map((c, i) => (
-                <div key={i} className="flex items-center justify-between p-3 bg-muted/40 rounded-xl cursor-pointer hover:bg-muted/60 transition-colors" onClick={() => navigate("/interviews")}>
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-amber-500/15 flex items-center justify-center"><Award size={16} className="text-amber-500 dark:text-amber-400" /></div>
-                    <div><p className="font-semibold text-foreground text-sm">{c.title}</p><p className="text-xs text-muted-foreground">{c.date}</p></div>
+              {recentCertificates.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-4">No certificates yet. Score 70%+ to earn one!</p>
+              ) : (
+                recentCertificates.map((cert) => (
+                  <div key={cert.id} className="flex items-center justify-between p-3 bg-muted/40 rounded-xl cursor-pointer hover:bg-muted/60 transition-colors" onClick={() => navigate("/certificates")}>
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-xl bg-amber-500/15 flex items-center justify-center"><Award size={16} className="text-amber-500 dark:text-amber-400" /></div>
+                      <div><p className="font-semibold text-foreground text-sm">{cert.unique_id}</p><p className="text-xs text-muted-foreground">{new Date(cert.issue_date).toLocaleDateString()}</p></div>
+                    </div>
+                    <Badge color="green">{Math.round(cert.overall_score)}%</Badge>
                   </div>
-                  <Badge color="green">{c.score}%</Badge>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </Card>
         </motion.div>

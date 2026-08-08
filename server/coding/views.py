@@ -1,3 +1,4 @@
+import threading
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -6,6 +7,7 @@ from django.shortcuts import get_object_or_404
 from .models import CodingChallenge, CodingSubmission
 from .serializers import CodingChallengeSerializer, CodingSubmissionSerializer
 from .judge0_service import run_test_cases
+from ai_service.services import review_code
 
 class CodingChallengeViewSet(viewsets.ReadOnlyModelViewSet):
     """Viewset for reading coding challenges."""
@@ -87,7 +89,32 @@ class CodingChallengeViewSet(viewsets.ReadOnlyModelViewSet):
         
         submission.save()
 
-        # TODO: Trigger background AI code review if accepted
+        # Trigger background AI code review if accepted
+        if final_status == 'accepted':
+            def _run_review(submission_id, title, desc, code, lang, results):
+                try:
+                    review = review_code(title, desc, code, lang, results)
+                    sub = CodingSubmission.objects.get(id=submission_id)
+                    sub.ai_review = review['review']
+                    sub.optimization_suggestions = review['suggestions']
+                    sub.code_quality_score = review['quality_score']
+                    sub.complexity_analysis = review['complexity_analysis']
+                    sub.save(update_fields=[
+                        'ai_review', 'optimization_suggestions',
+                        'code_quality_score', 'complexity_analysis'
+                    ])
+                except Exception:
+                    pass
+
+            t = threading.Thread(
+                target=_run_review,
+                args=(
+                    submission.id, challenge.title, challenge.description,
+                    code, language, results
+                ),
+                daemon=True
+            )
+            t.start()
 
         serializer = CodingSubmissionSerializer(submission)
         return Response(serializer.data)

@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, MicOff, StopCircle, Brain, Volume2, Loader2, Play } from 'lucide-react';
 import api from '@/lib/api';
 import { toast } from 'sonner';
+import type { CurrentQuestion } from '@/types';
 
 export default function VoiceInterviewPage() {
   const { id } = useParams<{ id: string }>();
@@ -11,8 +12,8 @@ export default function VoiceInterviewPage() {
   
   const [isRecording, setIsRecording] = useState(false);
   const [transcript, setTranscript] = useState('');
-  const [currentQuestion, setCurrentQuestion] = useState<any>(null);
-  const [messages, setMessages] = useState<{role: string, content: string}[]>([]);
+  const [currentQuestion, setCurrentQuestion] = useState<CurrentQuestion | null>(null);
+  const [messages, setMessages] = useState<Array<{ role: string; content: string }>>([]);
   const [isAiSpeaking, setIsAiSpeaking] = useState(false);
   const [loading, setLoading] = useState(true);
   
@@ -22,11 +23,6 @@ export default function VoiceInterviewPage() {
   const sttRecorderRef = useRef<MediaRecorder | null>(null);
   const sttChunksRef = useRef<Blob[]>([]);
 
-  // Main MediaRecorder setup (for saving full video if needed)
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const recordedChunksRef = useRef<Blob[]>([]);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [stream, setStream] = useState<MediaStream | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   
   useEffect(() => {
@@ -57,35 +53,19 @@ export default function VoiceInterviewPage() {
       if (mounted) setLoading(false);
     });
 
-    // Initialize Media Streams
-    navigator.mediaDevices.getUserMedia({ audio: true, video: true })
+    // Initialize Media Streams - audio only (no camera needed)
+    navigator.mediaDevices.getUserMedia({ audio: true })
       .then((mediaStream) => {
         if (!mounted) {
           mediaStream.getTracks().forEach(track => track.stop());
           return;
         }
         localStream = mediaStream;
-        setStream(mediaStream);
         streamRef.current = mediaStream;
-        if (videoRef.current) {
-          videoRef.current.srcObject = mediaStream;
-        }
-        
-        // Full interview recording
-        const mediaRecorder = new MediaRecorder(mediaStream, { mimeType: 'video/webm' });
-        mediaRecorderRef.current = mediaRecorder;
-        
-        mediaRecorder.ondataavailable = (event) => {
-          if (event.data.size > 0) {
-            recordedChunksRef.current.push(event.data);
-          }
-        };
-        
-        mediaRecorder.start(1000); // collect data every second
       })
       .catch((err) => {
         console.error("Media access denied:", err);
-        if (mounted) toast.error("Camera/Microphone access is required for recording.");
+        if (mounted) toast.error("Microphone access is required for voice interview.");
       });
 
     return () => {
@@ -94,17 +74,11 @@ export default function VoiceInterviewPage() {
       if (sttRecorderRef.current && sttRecorderRef.current.state !== 'inactive') {
         sttRecorderRef.current.stop();
       }
-      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
-        mediaRecorderRef.current.stop();
-      }
       if (localStream) {
         localStream.getTracks().forEach(track => track.stop());
       }
       if (streamRef.current) {
         streamRef.current.getTracks().forEach(track => track.stop());
-      }
-      if (videoRef.current) {
-        videoRef.current.srcObject = null;
       }
     };
   }, [id, navigate]);
@@ -115,13 +89,17 @@ export default function VoiceInterviewPage() {
     
     const utterance = new SpeechSynthesisUtterance(text);
     
-    // Try to find a good English voice
+    // Find the best English voice
     const voices = synthRef.current.getVoices();
-    const goodVoice = voices.find(v => v.name.includes('Google') || v.name.includes('Samantha') || v.lang === 'en-US');
+    const goodVoice = voices.find(v => v.name.includes('Google') && v.lang.startsWith('en'))
+      || voices.find(v => v.name.includes('Samantha'))
+      || voices.find(v => v.lang === 'en-US')
+      || voices.find(v => v.lang.startsWith('en'));
     if (goodVoice) utterance.voice = goodVoice;
     
-    utterance.rate = 1.0;
+    utterance.rate = 0.95;
     utterance.pitch = 1.0;
+    utterance.volume = 1.0;
     
     utterance.onstart = () => setIsAiSpeaking(true);
     utterance.onend = () => setIsAiSpeaking(false);
@@ -206,27 +184,26 @@ export default function VoiceInterviewPage() {
     try {
       const res = await api.post(`/interviews/${id}/answer/`, { answer_text: answerText });
       
+      // Show score toast
+      const eval_ = res.data.evaluation;
+      if (eval_?.score !== undefined) {
+        const score = eval_.score;
+        const color = score >= 7 ? '🟢' : score >= 5 ? '🟡' : '🔴';
+        toast(`${color} Score: ${score.toFixed(1)}/10`, {
+          description: eval_.feedback || '',
+          duration: 4000,
+        });
+      }
+
       if (res.data.is_complete) {
-        // Stop media tracks immediately
+        // Stop audio tracks
         if (sttRecorderRef.current && sttRecorderRef.current.state !== 'inactive') {
           sttRecorderRef.current.stop();
-        }
-        if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
-          mediaRecorderRef.current.stop();
         }
         if (streamRef.current) {
           streamRef.current.getTracks().forEach(track => track.stop());
         }
-        if (stream) {
-          stream.getTracks().forEach(track => track.stop());
-        }
-        if (videoRef.current) {
-          videoRef.current.srcObject = null;
-        }
         
-        // Upload the recording in background
-        uploadRecording();
-
         toast.success('Interview completed!');
         setTimeout(() => navigate(`/interviews/${id}/results`), 2000);
       } else {
@@ -242,41 +219,15 @@ export default function VoiceInterviewPage() {
     }
   };
 
-  const uploadRecording = async () => {
-    if (recordedChunksRef.current.length === 0) return;
-    const blob = new Blob(recordedChunksRef.current, { type: 'video/webm' });
-    const formData = new FormData();
-    formData.append('video', blob, 'recording.webm');
-    
-    try {
-      await api.post(`/interviews/${id}/upload-recording/`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-    } catch (err) {
-      console.error("Failed to upload recording", err);
-    }
-  };
-
   const endInterview = async () => {
     setLoading(true);
     try {
       if (sttRecorderRef.current && sttRecorderRef.current.state !== 'inactive') {
         sttRecorderRef.current.stop();
       }
-      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
-        mediaRecorderRef.current.stop();
-      }
       if (streamRef.current) {
         streamRef.current.getTracks().forEach(track => track.stop());
       }
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-      }
-      if (videoRef.current) {
-        videoRef.current.srcObject = null;
-      }
-      
-      await uploadRecording();
       await api.post(`/interviews/${id}/end/`);
       navigate(`/interviews/${id}/results`);
     } catch {
@@ -309,24 +260,8 @@ export default function VoiceInterviewPage() {
       </div>
 
       {/* Main UI */}
-      <div className="flex-1 flex flex-col md:flex-row items-center justify-center gap-8 relative">
+      <div className="flex-1 flex flex-col items-center justify-center gap-8 relative">
         
-        {/* Camera Preview */}
-        {stream && (
-          <div className="w-64 h-48 md:w-80 md:h-60 bg-black rounded-2xl overflow-hidden shadow-xl border border-gray-800 shrink-0">
-            <video 
-              ref={videoRef} 
-              autoPlay 
-              playsInline 
-              muted 
-              className="w-full h-full object-cover transform -scale-x-100" 
-            />
-            <div className="absolute top-4 left-4 bg-red-500 text-white text-xs px-2 py-1 rounded-full animate-pulse flex items-center gap-1 font-semibold z-10 shadow-lg shadow-red-500/50">
-              <span className="w-1.5 h-1.5 bg-white rounded-full"></span> REC
-            </div>
-          </div>
-        )}
-
         {/* Visualizer Ring */}
         <div className="relative flex items-center justify-center mb-12">
           {isAiSpeaking && (

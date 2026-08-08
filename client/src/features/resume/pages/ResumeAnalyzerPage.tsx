@@ -34,7 +34,7 @@ export default function ResumeAnalyzerPage() {
 
     try {
       const res = await api.post('/resumes/upload/', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+        headers: { 'Content-Type': 'multipart/form-data' }
       });
       const newResume = res.data;
       setResumes(prev => [newResume, ...prev]);
@@ -64,6 +64,7 @@ export default function ResumeAnalyzerPage() {
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) handleUpload(file);
+    e.target.value = ''; // Reset input so same file can be uploaded again
   };
 
   const r = selectedResume;
@@ -106,9 +107,20 @@ export default function ResumeAnalyzerPage() {
                 <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                   Drag & drop your resume here
                 </p>
-                <p className="text-xs mt-1" style={{ color: 'var(--text-tertiary)' }}>
+                <p className="text-xs mt-1 mb-4" style={{ color: 'var(--text-tertiary)' }}>
                   PDF only, max 5MB
                 </p>
+                <button 
+                  type="button" 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    document.getElementById('resume-input')?.click();
+                  }}
+                  className="bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center gap-2 mx-auto"
+                >
+                  <Upload size={16} />
+                  Browse Files
+                </button>
               </div>
             </div>
           )}

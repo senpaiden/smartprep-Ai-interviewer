@@ -15,6 +15,7 @@ class CodingChallengeSerializer(serializers.ModelSerializer):
 
 class CodingSubmissionSerializer(serializers.ModelSerializer):
     challenge_title = serializers.CharField(source='challenge.title', read_only=True)
+    score = serializers.SerializerMethodField()
     
     class Meta:
         model = CodingSubmission
@@ -23,13 +24,16 @@ class CodingSubmissionSerializer(serializers.ModelSerializer):
             'status', 'execution_time_ms', 'memory_used_kb',
             'test_results', 'total_tests', 'passed_tests', 'score',
             'stdout', 'stderr', 'compile_output',
-            'ai_review', 'code_quality_score', 'optimization_suggestions',
-            'created_at'
+            'ai_review', 'code_quality_score', 'complexity_analysis',
+            'optimization_suggestions', 'created_at'
         ]
         read_only_fields = [
             'status', 'execution_time_ms', 'memory_used_kb',
-            'test_results', 'total_tests', 'passed_tests', 'score',
+            'test_results', 'total_tests', 'passed_tests',
             'stdout', 'stderr', 'compile_output',
-            'ai_review', 'code_quality_score', 'optimization_suggestions',
-            'created_at'
+            'ai_review', 'code_quality_score', 'complexity_analysis',
+            'optimization_suggestions', 'created_at'
         ]
+
+    def get_score(self, obj):
+        return obj.score

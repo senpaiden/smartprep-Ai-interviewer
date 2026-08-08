@@ -19,8 +19,8 @@ class User(AbstractUser):
     is_email_verified = models.BooleanField(default=False)
     email_verification_token = models.CharField(max_length=255, blank=True, null=True)
     password_reset_token = models.CharField(max_length=255, blank=True, null=True)
+    password_reset_token_expires = models.DateTimeField(blank=True, null=True)
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
-    google_id = models.CharField(max_length=255, blank=True, null=True, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

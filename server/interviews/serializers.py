@@ -1,7 +1,7 @@
 """Serializers for the interviews app."""
 
 from rest_framework import serializers
-from .models import Interview, InterviewQuestion, InterviewAnswer, Certificate, Company, CompanyInterviewSet
+from .models import Interview, InterviewQuestion, InterviewAnswer, Certificate, Company, CompanyInterviewSet, KnowledgeBaseDocument
 
 
 class InterviewAnswerSerializer(serializers.ModelSerializer):
@@ -12,13 +12,13 @@ class InterviewAnswerSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'answer_text', 'technical_accuracy', 'confidence',
             'communication', 'grammar', 'vocabulary', 'fluency',
-            'relevance', 'completeness', 'problem_solving',
+            'english_fluency', 'relevance', 'completeness', 'problem_solving',
             'feedback', 'strengths', 'improvements', 'overall_score',
             'created_at',
         ]
         read_only_fields = [
             'technical_accuracy', 'confidence', 'communication',
-            'grammar', 'vocabulary', 'fluency', 'relevance',
+            'grammar', 'vocabulary', 'fluency', 'english_fluency', 'relevance',
             'completeness', 'problem_solving', 'feedback',
             'strengths', 'improvements',
         ]
@@ -44,16 +44,19 @@ class InterviewSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'interview_type', 'difficulty', 'status',
             'duration_minutes', 'total_questions', 'language',
-            'tech_stack', 'company', 'overall_score', 'technical_score',
+            'tech_stack', 'company', 'role', 'candidate_id', 'covered_days',
+            'overall_score', 'technical_score',
             'communication_score', 'confidence_score', 'grammar_score',
-            'problem_solving_score', 'current_question_index',
+            'english_fluency_score', 'problem_solving_score', 'recording_url',
+            'current_question_index', 'ai_summary',
             'started_at', 'completed_at', 'created_at', 'questions',
             'questions_answered',
         ]
         read_only_fields = [
             'status', 'overall_score', 'technical_score',
             'communication_score', 'confidence_score', 'grammar_score',
-            'problem_solving_score', 'current_question_index',
+            'english_fluency_score', 'problem_solving_score', 'recording_url',
+            'current_question_index', 'ai_summary',
             'started_at', 'completed_at',
         ]
 
@@ -66,7 +69,8 @@ class InterviewCreateSerializer(serializers.ModelSerializer):
         model = Interview
         fields = [
             'interview_type', 'difficulty', 'duration_minutes',
-            'total_questions', 'language', 'tech_stack', 'company',
+            'total_questions', 'language', 'tech_stack', 'company', 'role',
+            'candidate_id',
         ]
 
 
@@ -79,7 +83,7 @@ class InterviewListSerializer(serializers.ModelSerializer):
             'id', 'interview_type', 'difficulty', 'status',
             'duration_minutes', 'total_questions', 'overall_score',
             'current_question_index', 'started_at', 'completed_at',
-            'created_at', 'questions_answered', 'company',
+            'created_at', 'questions_answered', 'company', 'role',
         ]
 
     def get_questions_answered(self, obj):
@@ -115,3 +119,10 @@ class CompanySerializer(serializers.ModelSerializer):
     class Meta:
         model = Company
         fields = ['id', 'name', 'logo_url', 'industry', 'description', 'interview_sets']
+
+
+class KnowledgeBaseDocumentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = KnowledgeBaseDocument
+        fields = ['id', 'filename', 'file_path', 'created_at']
+        read_only_fields = ['id', 'filename', 'file_path', 'created_at']

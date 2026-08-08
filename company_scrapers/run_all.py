@@ -31,7 +31,8 @@ def run_all():
                 cwd=current_dir,
                 capture_output=True,
                 text=True,
-                check=True
+                check=True,
+                timeout=300
             )
             print(result.stdout)
             success_count += 1

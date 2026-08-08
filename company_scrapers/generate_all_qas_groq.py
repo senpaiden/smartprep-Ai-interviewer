@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from questions_pdf_generator import generate_questions_pdf
 
-load_dotenv('server/.env')
+load_dotenv(os.path.join(os.path.dirname(__file__), '..', 'server', '.env'))
 client = Groq(api_key=os.getenv('GROQ_API_KEY'))
 
 companies = [

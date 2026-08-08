@@ -2,6 +2,8 @@ import os
 import re
 import json
 import requests
+import time
+from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 from datetime import datetime
 from reportlab.lib.pagesizes import letter
@@ -41,8 +43,9 @@ def download_logo(url):
         return None
     
     # Generate a safe filename
-    ext = url.split(".")[-1].split("?")[0].lower()
-    if ext not in ["jpg", "jpeg", "png", "gif"]:
+    parsed_url = urlparse(url)
+    ext = os.path.splitext(parsed_url.path)[1][1:].lower()
+    if ext not in ["jpg", "jpeg", "png", "gif", "svg", "webp"]:
         ext = "png"
     
     # Hash URL to prevent collision

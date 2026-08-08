@@ -12,7 +12,8 @@ class ResumeSerializer(serializers.ModelSerializer):
             'soft_skills', 'projects', 'certifications', 'education',
             'experience', 'ats_score', 'resume_rating', 'missing_keywords',
             'missing_skills', 'grammar_issues', 'formatting_issues',
-            'improvement_suggestions', 'created_at', 'updated_at',
+            'improvement_suggestions', 'company_match_status',
+            'company_match_reason', 'created_at', 'updated_at',
         ]
         read_only_fields = fields
 

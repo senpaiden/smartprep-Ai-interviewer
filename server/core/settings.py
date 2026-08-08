@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 from datetime import timedelta
 from dotenv import load_dotenv
+import dj_database_url
 
 load_dotenv(override=True)
 
@@ -37,6 +38,7 @@ INSTALLED_APPS = [
     'ai_service',
     'notifications',
     'coding',
+    'hackathon',
 ]
 
 MIDDLEWARE = [
@@ -70,12 +72,21 @@ TEMPLATES = [
 WSGI_APPLICATION = 'core.wsgi.application'
 
 # Database - PostgreSQL
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# Database Configuration
+# This uses dj_database_url to parse the DATABASE_URL environment variable.
+# If no DATABASE_URL is provided, it safely falls back to local SQLite.
+db_url = os.getenv('DATABASE_URL', '').strip()
+if db_url:
+    DATABASES = {
+        'default': dj_database_url.parse(db_url, conn_max_age=600, conn_health_checks=True)
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # Custom User Model
 AUTH_USER_MODEL = 'accounts.User'
@@ -148,8 +159,10 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # AI Keys
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
+NVIDIA_API_KEY = os.getenv('NVIDIA_API_KEY', '')
 GROQ_API_KEY = os.getenv('GROQ_API_KEY', '')
+QDRANT_API_KEY = os.getenv('QDRANT_API_KEY', '')
+QDRANT_URL = os.getenv('QDRANT_URL', '')
 
 # Email
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Console for dev

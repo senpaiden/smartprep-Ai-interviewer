@@ -4,7 +4,7 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 
 print("Starting script...", flush=True)
-load_dotenv('server/.env')
+load_dotenv(os.path.join(os.path.dirname(__file__), '..', 'server', '.env'))
 print("Loaded .env", flush=True)
 genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
 print("Configured Gemini API", flush=True)

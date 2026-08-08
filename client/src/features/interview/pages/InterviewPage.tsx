@@ -20,7 +20,13 @@ export default function InterviewPage() {
   const [answer, setAnswer] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
+  // Timer — countdown from duration
+  const [durationSeconds] = useState(() => {
+    const dur = parseInt(new URLSearchParams(window.location.search).get('duration') || '0');
+    return dur > 0 ? dur * 60 : 0;
+  });
   const [timer, setTimer] = useState(0);
+  const [timeUp, setTimeUp] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -31,6 +37,11 @@ export default function InterviewPage() {
       if (interview.status === 'completed') {
         navigate(`/interviews/${id}/results`);
         return;
+      }
+
+      // Set initial timer based on interview duration
+      if (interview.duration_minutes && !durationSeconds) {
+        setTimer(interview.duration_minutes * 60);
       }
 
       // Reconstruct chat from existing Q&As
@@ -56,12 +67,33 @@ export default function InterviewPage() {
     }).catch(() => toast.error('Failed to load interview'));
   }, [id, navigate]);
 
-  // Timer
+  // Timer — count up (or down if duration set)
   useEffect(() => {
-    if (isComplete) return;
-    const interval = setInterval(() => setTimer(t => t + 1), 1000);
+    if (isComplete || timeUp) return;
+    const interval = setInterval(() => {
+      if (durationSeconds > 0) {
+        setTimer(t => {
+          if (t <= 1) {
+            setTimeUp(true);
+            clearInterval(interval);
+            return 0;
+          }
+          return t - 1;
+        });
+      } else {
+        setTimer(t => t + 1);
+      }
+    }, 1000);
     return () => clearInterval(interval);
-  }, [isComplete]);
+  }, [isComplete, timeUp, durationSeconds]);
+
+  // Auto-end when time is up
+  useEffect(() => {
+    if (timeUp && !isComplete) {
+      toast.warning("Time's up! Ending interview...");
+      handleEnd();
+    }
+  }, [timeUp, isComplete]);
 
   // Auto-scroll
   useEffect(() => {
@@ -153,9 +185,10 @@ export default function InterviewPage() {
 
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 px-4 py-2 rounded-xl glass-card">
-            <Clock className="w-4 h-4 text-indigo-400" />
-            <span className="text-sm font-mono font-semibold" style={{ color: 'var(--text-primary)' }}>
+            <Clock className={`w-4 h-4 ${timeUp ? 'text-red-400' : 'text-indigo-400'}`} />
+            <span className={`text-sm font-mono font-semibold ${timeUp ? 'text-red-400' : ''}`} style={{ color: timeUp ? undefined : 'var(--text-primary)' }}>
               {formatTime(timer)}
+              {durationSeconds > 0 && <span className="text-xs ml-1 opacity-60">remaining</span>}
             </span>
           </div>
 
@@ -230,21 +263,41 @@ export default function InterviewPage() {
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
-                    className="mt-2 p-3 rounded-xl text-xs space-y-1"
+                    className="mt-2 p-4 rounded-xl text-xs space-y-2"
                     style={{ background: 'var(--bg-glass)', border: '1px solid var(--border)' }}
                   >
-                    <div className="flex gap-2 flex-wrap">
-                      <span className="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400">
-                        Relevance: {msg.evaluation.relevance}%
-                      </span>
-                      <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400">
-                        Score: {Math.round(
-                          (msg.evaluation.technical_accuracy + msg.evaluation.relevance + msg.evaluation.completeness) / 3
-                        )}%
-                      </span>
+                    {/* Score */}
+                    <div className="flex items-center gap-3">
+                      <div className={`text-2xl font-bold ${
+                        (msg.evaluation.score || 0) >= 7 ? 'text-emerald-400' :
+                        (msg.evaluation.score || 0) >= 5 ? 'text-amber-400' : 'text-red-400'
+                      }`}>
+                        {(msg.evaluation.score || 0).toFixed(1)}
+                      </div>
+                      <div className="text-xs" style={{ color: 'var(--text-tertiary)' }}>/ 10</div>
                     </div>
+
+                    {/* Reason */}
                     {msg.evaluation.feedback && (
-                      <p style={{ color: 'var(--text-secondary)' }}>{msg.evaluation.feedback}</p>
+                      <div>
+                        <p className="font-semibold mb-0.5" style={{ color: 'var(--text-secondary)' }}>Reason</p>
+                        <p style={{ color: 'var(--text-primary)' }}>{msg.evaluation.feedback}</p>
+                      </div>
+                    )}
+
+                    {/* Recommendations */}
+                    {msg.evaluation.improvements && msg.evaluation.improvements.length > 0 && (
+                      <div>
+                        <p className="font-semibold mb-1" style={{ color: 'var(--text-secondary)' }}>Learn & Improve</p>
+                        <ul className="space-y-1">
+                          {msg.evaluation.improvements.map((rec, idx) => (
+                            <li key={idx} className="flex items-start gap-2" style={{ color: 'var(--text-primary)' }}>
+                              <span className="text-indigo-400 mt-0.5">•</span>
+                              {rec}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
                     )}
                   </motion.div>
                 )}

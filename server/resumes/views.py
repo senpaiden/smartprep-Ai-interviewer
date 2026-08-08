@@ -9,6 +9,7 @@ from PyPDF2 import PdfReader
 from .models import Resume
 from .serializers import ResumeSerializer, ResumeUploadSerializer
 from ai_service.services import analyze_resume
+from interviews.models import Company
 from notifications.models import Notification
 
 
@@ -46,8 +47,6 @@ def upload_resume(request):
 
     return Response(ResumeSerializer(resume).data, status=status.HTTP_201_CREATED)
 
-
-from interviews.models import Company
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])

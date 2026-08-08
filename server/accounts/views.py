@@ -7,6 +7,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.conf import settings
+from django.utils import timezone
 from django.core.mail import send_mail
 from django.db.models import Avg, Count, Q
 
@@ -31,6 +32,20 @@ class RegisterView(generics.CreateAPIView):
 
         # Generate JWT tokens
         refresh = RefreshToken.for_user(user)
+
+        # Send verification email
+        token = str(uuid.uuid4())
+        user.email_verification_token = token
+        user.save()
+
+        verify_url = f"{settings.FRONTEND_URL}/verify-email?token={token}"
+        send_mail(
+            'Verify Your Email - Smart Interview Platform',
+            f'Click the link to verify your email: {verify_url}',
+            settings.EMAIL_HOST_USER,
+            [user.email],
+            fail_silently=True,
+        )
 
         return Response({
             'message': 'Account created successfully.',
@@ -68,56 +83,6 @@ class LoginView(generics.GenericAPIView):
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
-def google_auth(request):
-    """Handle Google OAuth login/signup."""
-    google_id = request.data.get('google_id')
-    email = request.data.get('email')
-    first_name = request.data.get('first_name', '')
-    last_name = request.data.get('last_name', '')
-    avatar_url = request.data.get('avatar_url', '')
-
-    if not google_id or not email:
-        return Response(
-            {'error': 'google_id and email are required.'},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-
-    # Try to find existing user
-    try:
-        user = User.objects.get(google_id=google_id)
-    except User.DoesNotExist:
-        try:
-            user = User.objects.get(email=email)
-            user.google_id = google_id
-            user.save()
-        except User.DoesNotExist:
-            # Create new user
-            user = User.objects.create(
-                email=email,
-                username=email.split('@')[0] + str(uuid.uuid4())[:4],
-                first_name=first_name,
-                last_name=last_name,
-                google_id=google_id,
-                is_email_verified=True,
-            )
-            user.set_unusable_password()
-            user.save()
-            Profile.objects.create(user=user)
-
-    refresh = RefreshToken.for_user(user)
-
-    return Response({
-        'message': 'Google login successful.',
-        'user': UserSerializer(user).data,
-        'tokens': {
-            'access': str(refresh.access_token),
-            'refresh': str(refresh),
-        }
-    })
-
-
-@api_view(['POST'])
-@permission_classes([AllowAny])
 def forgot_password(request):
     """Send password reset email."""
     serializer = ForgotPasswordSerializer(data=request.data)
@@ -128,6 +93,7 @@ def forgot_password(request):
         user = User.objects.get(email=email)
         token = str(uuid.uuid4())
         user.password_reset_token = token
+        user.password_reset_token_expires = timezone.now() + timezone.timedelta(hours=1)
         user.save()
 
         reset_url = f"{settings.FRONTEND_URL}/reset-password?token={token}"
@@ -153,8 +119,11 @@ def reset_password(request):
 
     try:
         user = User.objects.get(password_reset_token=serializer.validated_data['token'])
+        if user.password_reset_token_expires and user.password_reset_token_expires < timezone.now():
+            return Response({'error': 'Token has expired.'}, status=status.HTTP_400_BAD_REQUEST)
         user.set_password(serializer.validated_data['password'])
         user.password_reset_token = None
+        user.password_reset_token_expires = None
         user.save()
         return Response({'message': 'Password reset successfully.'})
     except User.DoesNotExist:
@@ -195,6 +164,57 @@ def change_password(request):
     user.set_password(serializer.validated_data['new_password'])
     user.save()
     return Response({'message': 'Password changed successfully.'})
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def verify_email(request):
+    """Verify email with token."""
+    token = request.query_params.get('token')
+    if not token:
+        return Response(
+            {'error': 'Token is required.'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    try:
+        user = User.objects.get(email_verification_token=token)
+        user.is_email_verified = True
+        user.email_verification_token = None
+        user.save()
+        return Response({'message': 'Email verified successfully.'})
+    except User.DoesNotExist:
+        return Response(
+            {'error': 'Invalid token.'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def send_verification_email(request):
+    """Resend verification email to current user."""
+    user = request.user
+    if user.is_email_verified:
+        return Response(
+            {'error': 'Email is already verified.'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    token = str(uuid.uuid4())
+    user.email_verification_token = token
+    user.save()
+
+    verify_url = f"{settings.FRONTEND_URL}/verify-email?token={token}"
+    send_mail(
+        'Verify Your Email - Smart Interview Platform',
+        f'Click the link to verify your email: {verify_url}',
+        settings.EMAIL_HOST_USER,
+        [user.email],
+        fail_silently=True,
+    )
+
+    return Response({'message': 'Verification email sent.'})
 
 
 class UserListView(generics.ListAPIView):
@@ -259,16 +279,12 @@ def roadmap(request):
             if isinstance(plan, dict) and "weak_areas" in plan:
                 return Response(plan)
     study_plan = {
-        "weak_areas": ["System Design Architecture", "Advanced Dynamic Programming", "Behavioral Context"],
-        "courses": [
-            {"title": "Grokking the System Design Interview", "url": "#", "type": "Course"},
-            {"title": "Mastering Dynamic Programming", "url": "#", "type": "Course"},
-            {"title": "Cracking the Coding Interview", "url": "#", "type": "Book"}
-        ],
+        "weak_areas": ["No weak areas identified yet"],
+        "courses": [],
         "daily_tasks": [
-            "Solve 1 Medium LeetCode DP problem",
-            "Read 1 chapter on Distributed Systems",
-            "Practice the STAR method for behavioral questions for 15 mins"
+            "Start by taking an interview to identify your weak areas",
+            "Upload your resume for personalized feedback",
+            "Check the roadmap page with a specific topic to generate a plan"
         ]
     }
     
@@ -276,3 +292,40 @@ def roadmap(request):
     profile.save()
     
     return Response(study_plan)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def dashboard_stats(request):
+    """Get dashboard stats for current user."""
+    from hackathon.models import HackathonSession
+    from resumes.models import Resume
+    from interviews.models import Interview
+    
+    user_sessions = HackathonSession.objects.filter(user=request.user)
+    completed_sessions = user_sessions.filter(is_done=True).count()
+    total = user_sessions.count()
+
+    user_resumes = Resume.objects.filter(user=request.user)
+    latest_resume = user_resumes.order_by('-created_at').first()
+    
+    resume_score = "N/A"
+    ats_score = "N/A"
+    if latest_resume and latest_resume.status == 'analyzed':
+        resume_score = f"{latest_resume.resume_rating * 20:.0f}/100"
+        ats_score = f"{latest_resume.ats_score}%"
+    
+    # Calculate real overall rating from completed interviews
+    from django.db.models import Avg
+    interview_agg = Interview.objects.filter(
+        user=request.user, status='completed'
+    ).aggregate(avg=Avg('overall_score'))
+    avg_score = interview_agg['avg']
+    overall_rating = f"{avg_score / 20:.1f}/5.0" if avg_score else "N/A"
+    
+    return Response({
+        'resume_score': resume_score,
+        'ats_score': ats_score,
+        'interviews_completed': completed_sessions,
+        'overall_rating': overall_rating,
+        'recent_interviews': total
+    })

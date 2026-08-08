@@ -25,7 +25,9 @@ class RegisterSerializer(serializers.ModelSerializer):
         validated_data.pop('password_confirm')
         user = User.objects.create_user(**validated_data)
         # Create profile automatically
-        Profile.objects.create(user=user)
+        profile = Profile.objects.create(user=user)
+        profile.calculate_completion()
+        profile.save()
         return user
 
 

@@ -107,6 +107,9 @@ class Interview(models.Model):
     language = models.CharField(max_length=50, default='English')
     tech_stack = models.JSONField(default=list, blank=True)
     company = models.CharField(max_length=100, blank=True, default='')
+    role = models.CharField(max_length=100, blank=True, default='')
+    candidate_id = models.CharField(max_length=50, blank=True, default='')
+    covered_days = models.JSONField(default=list, blank=True)
 
     # Results
     overall_score = models.FloatField(default=0.0)
@@ -119,6 +122,9 @@ class Interview(models.Model):
 
     # AI Context (stored conversation history for context-aware follow-ups)
     ai_context = models.JSONField(default=list, blank=True)
+
+    # AI Summary Report (generated on completion)
+    ai_summary = models.JSONField(default=dict, blank=True)
 
     current_question_index = models.IntegerField(default=0)
     started_at = models.DateTimeField(null=True, blank=True)

@@ -57,6 +57,16 @@ export interface RegisterRequest {
   password_confirm: string;
 }
 
+export interface CandidateProfile {
+  id: string;
+  name: string;
+  jobRole: string;
+  yearsExperience: number;
+  education: string;
+  missionsCount: number;
+  weak_topics: string[];
+}
+
 export interface Interview {
   id: string;
   interview_type: InterviewType;
@@ -67,10 +77,14 @@ export interface Interview {
   language: string;
   tech_stack: string[];
   company: string;
+  role: string;
+  candidate_id: string;
+  covered_days: number[];
   overall_score: number;
   technical_score: number;
   communication_score: number;
   confidence_score: number;
+  english_fluency_score: number;
   grammar_score: number;
   problem_solving_score: number;
   current_question_index: number;
@@ -79,11 +93,25 @@ export interface Interview {
   created_at: string;
   questions: InterviewQuestion[];
   questions_answered: number;
+  recording_url?: string;
+  ai_summary?: {
+    overall_feedback: string;
+    top_strengths: string[];
+    areas_to_improve: string[];
+    recommended_topics: string[];
+    overall_score: number;
+    hire_recommendation: string;
+  };
 }
 
 export type InterviewType = 'hr' | 'technical' | 'coding' | 'behavioral' | 'company_specific' | 'custom';
 export type Difficulty = 'easy' | 'medium' | 'hard';
 export type InterviewStatus = 'setup' | 'in_progress' | 'completed' | 'cancelled';
+
+export type InterviewRole =
+  | 'full-stack' | 'ai-ml' | 'frontend' | 'backend'
+  | 'devops' | 'data-engineer' | 'data-scientist' | 'ui-ux'
+  | 'mobile' | 'cloud-architect' | 'cybersecurity' | 'product-manager';
 
 export interface InterviewQuestion {
   id: string;
@@ -101,6 +129,7 @@ export interface InterviewAnswer {
   technical_accuracy: number;
   confidence: number;
   communication: number;
+  english_fluency: number;
   grammar: number;
   vocabulary: number;
   fluency: number;
@@ -164,6 +193,10 @@ export interface InterviewStats {
   };
   recent_interviews: Interview[];
   progress_over_time?: { day: string; score: number }[];
+  resume_score: string;
+  ats_score: string;
+  interviews_completed: number;
+  overall_rating: string;
 }
 
 export interface Certificate {
@@ -198,9 +231,11 @@ export interface CurrentQuestion {
 }
 
 export interface AnswerEvaluation {
+  score: number;
   technical_accuracy: number;
   confidence: number;
   communication: number;
+  english_fluency: number;
   grammar: number;
   vocabulary: number;
   fluency: number;

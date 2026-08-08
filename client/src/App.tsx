@@ -26,8 +26,9 @@ const CodingEditorPage = lazy(() => import('@/features/coding/pages/CodingEditor
 const LeaderboardPage = lazy(() => import('@/features/leaderboard/pages/LeaderboardPage'));
 const RoadmapPage = lazy(() => import('@/features/roadmap/pages/RoadmapPage'));
 const CertificatesPage = lazy(() => import('@/features/certificates/pages/CertificatesPage'));
-const AdminDashboardPage = lazy(() => import('@/features/admin/pages/AdminDashboardPage'));
 const CompanyInterviewsPage = lazy(() => import('@/features/companies/pages/CompanyInterviewsPage'));
+const HackathonChatPage = lazy(() => import('@/features/hackathon/pages/HackathonChatPage'));
+const HackathonHistoryPage = lazy(() => import('@/features/hackathon/pages/HackathonHistoryPage'));
 
 function PageLoader() {
   return (
@@ -85,10 +86,22 @@ export default function App() {
             <Route path="roadmap" element={<RoadmapPage />} />
             <Route path="certificates" element={<CertificatesPage />} />
             <Route path="companies" element={<CompanyInterviewsPage />} />
-            <Route path="admin" element={<AdminDashboardPage />} />
           </Route>
-              </Routes>
-            </Suspense>
+
+          {/* Hackathon Route */}
+          <Route path="/hackathon" element={<ProtectedRoute><HackathonChatPage /></ProtectedRoute>} />
+          <Route path="/hackathon/history" element={<ProtectedRoute><HackathonHistoryPage /></ProtectedRoute>} />
+
+          {/* 404 Catch-all */}
+          <Route path="*" element={
+            <div className="min-h-screen flex flex-col items-center justify-center bg-background gap-4">
+              <h1 className="text-6xl font-extrabold" style={{ color: 'var(--text-primary)' }}>404</h1>
+              <p style={{ color: 'var(--text-secondary)' }}>Page not found</p>
+              <button onClick={() => window.location.href = '/dashboard'} className="px-6 py-2 rounded-xl gradient-primary text-white font-medium">Go to Dashboard</button>
+            </div>
+          } />
+        </Routes>
+      </Suspense>
           </BrowserRouter>
           <Toaster
             position="top-right"
