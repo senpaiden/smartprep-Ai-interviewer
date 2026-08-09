@@ -9,6 +9,8 @@ from sqlalchemy import select
 from app.api.deps import get_db
 from app.db.models import HackathonSession
 from app.services import ai_service
+from app.services.qdrant_service import qdrant_service
+
 
 router = APIRouter(prefix="/api/interview", tags=["Hackathon Spec"])
 
@@ -163,19 +165,32 @@ async def handle_hackathon_interview(
             "feedback": feedback_report
         }
 
-    # Generate Next Question
+    # Generate Next Question using Qdrant Vector Retrieval
     next_q_num = current_q_count + 1
     candidate_info = sess_data.get("candidate", {})
     candidate_name = candidate_info.get("member", {}).get("name", "Candidate") if isinstance(candidate_info, dict) else "Candidate"
     
+    # Qdrant Vector Search over 31-Day AI Cohort Curriculum
+    retrieved_docs = qdrant_service.search_curriculum(user_message or "RAG vector search prompt engineering", top_k=2)
+    retrieved_text = "\n".join([f"Day {doc['day']}: {doc['topic']} - {doc['module']}" for doc in retrieved_docs])
+    
+    curriculum_ctx = {
+        "candidate_name": candidate_name,
+        "candidate_role": candidate_info.get("member", {}).get("jobRole", "AI Engineer"),
+        "retrieved_curriculum": retrieved_text,
+        "covered_days": [doc['day'] for doc in retrieved_docs]
+    }
+
     next_question = ai_service.generate_interview_question(
         interview_type="hackathon_cohort",
         difficulty="medium",
         tech_stack=["Agentic AI", "MCP Server", "FastAPI", "Vector Search"],
         context=[{"role": "user", "content": user_message}],
         question_number=next_q_num,
-        total_questions=8
+        total_questions=8,
+        curriculum_context=curriculum_ctx
     )
+
     if not next_question:
         next_question = f"Great response, {candidate_name}. Moving on to Question {next_q_num}: How did you implement tool selection and context management in your multi-agent workflow?"
 
