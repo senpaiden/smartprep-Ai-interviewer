@@ -34,10 +34,17 @@ export default function HackathonChatPage() {
   useEffect(() => {
     if (!hasSetup) {
       api.get('/interview/candidates/')
-        .then(res => setCandidates(res.data.candidates))
-        .catch(() => setError('Failed to load candidates'));
+        .then(res => {
+          const list = Array.isArray(res.data?.candidates) ? res.data.candidates : (Array.isArray(res.data) ? res.data : []);
+          setCandidates(list);
+        })
+        .catch(() => {
+          setCandidates([]);
+          setError('Failed to load candidates');
+        });
     }
   }, [hasSetup]);
+
 
   const startInterview = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -122,11 +129,12 @@ export default function HackathonChatPage() {
                 style={{ background: 'var(--bg-glass)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
               >
                 <option value="-1" disabled>-- Choose a candidate --</option>
-                {candidates.map((c, i) => (
+                {(candidates || []).map((c, i) => (
                   <option key={i} value={i}>
-                    {c.member?.name} - {c.member?.jobRole}
+                    {c?.member?.name || c?.name || `Candidate ${i+1}`} - {c?.member?.jobRole || c?.jobRole || 'AI Cohort Student'}
                   </option>
                 ))}
+
               </select>
             </div>
             <button
@@ -233,14 +241,14 @@ export default function HackathonChatPage() {
                   <div className="p-4 rounded-xl" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border)' }}>
                     <h3 className="font-semibold text-green-400 mb-2">Key Strengths</h3>
                     <ul className="list-disc list-inside text-sm space-y-1" style={{ color: 'var(--text-secondary)' }}>
-                      {feedback.strengths.map((s, i) => <li key={i}>{s}</li>)}
+                      {(feedback?.strengths || []).map((s, i) => <li key={i}>{s}</li>)}
                     </ul>
                   </div>
                   
                   <div className="p-4 rounded-xl" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border)' }}>
                     <h3 className="font-semibold text-orange-400 mb-2">Areas for Growth</h3>
                     <ul className="list-disc list-inside text-sm space-y-1" style={{ color: 'var(--text-secondary)' }}>
-                      {feedback.gaps.map((g, i) => <li key={i}>{g}</li>)}
+                      {(feedback?.gaps || []).map((g, i) => <li key={i}>{g}</li>)}
                     </ul>
                   </div>
                 </div>
@@ -248,9 +256,10 @@ export default function HackathonChatPage() {
                 <div className="p-4 rounded-xl" style={{ background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.2)' }}>
                   <h3 className="font-semibold text-indigo-400 mb-2">Next Steps</h3>
                   <ul className="list-disc list-inside text-sm space-y-1" style={{ color: 'var(--text-secondary)' }}>
-                    {feedback.next.map((n, i) => <li key={i}>{n}</li>)}
+                    {(feedback?.next || []).map((n, i) => <li key={i}>{n}</li>)}
                   </ul>
                 </div>
+
               </div>
             </motion.div>
           )}
