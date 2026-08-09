@@ -18,6 +18,7 @@ export default function VoiceInterviewPage() {
   const [loading, setLoading] = useState(true);
   
   const synthRef = useRef<SpeechSynthesis>(window.speechSynthesis);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   
   // STT MediaRecorder setup
   const sttRecorderRef = useRef<MediaRecorder | null>(null);
@@ -54,19 +55,28 @@ export default function VoiceInterviewPage() {
     });
 
     // Initialize Media Streams - audio only (no camera needed)
-    navigator.mediaDevices.getUserMedia({ audio: true })
-      .then((mediaStream) => {
-        if (!mounted) {
-          mediaStream.getTracks().forEach(track => track.stop());
-          return;
-        }
-        localStream = mediaStream;
-        streamRef.current = mediaStream;
-      })
-      .catch((err) => {
-        console.error("Media access denied:", err);
-        if (mounted) toast.error("Microphone access is required for voice interview.");
-      });
+    if (navigator?.mediaDevices?.getUserMedia) {
+      navigator.mediaDevices.getUserMedia({ audio: true })
+        .then((mediaStream) => {
+          if (!mounted) {
+            mediaStream.getTracks().forEach(track => track.stop());
+            return;
+          }
+          localStream = mediaStream;
+          streamRef.current = mediaStream;
+        })
+        .catch((err) => {
+          console.error("Media access denied:", err);
+          if (mounted) toast.error("Microphone access is required for voice interview.");
+        });
+    } else {
+      if (mounted) {
+        toast.error("Microphone requires HTTPS on mobile devices.", {
+          description: "Browsers block microphone access over plain http:// on IP addresses. Use localtunnel or HTTPS.",
+          duration: 8000
+        });
+      }
+    }
 
     return () => {
       mounted = false;
@@ -84,28 +94,83 @@ export default function VoiceInterviewPage() {
   }, [id, navigate]);
 
   const speakText = (text: string) => {
-    if (!synthRef.current) return;
-    synthRef.current.cancel(); // cancel previous
+    if (!text) return;
     
-    const utterance = new SpeechSynthesisUtterance(text);
+    // Stop any existing audio stream
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
     
-    // Find the best English voice
-    const voices = synthRef.current.getVoices();
-    const goodVoice = voices.find(v => v.name.includes('Google') && v.lang.startsWith('en'))
-      || voices.find(v => v.name.includes('Samantha'))
-      || voices.find(v => v.lang === 'en-US')
-      || voices.find(v => v.lang.startsWith('en'));
-    if (goodVoice) utterance.voice = goodVoice;
-    
-    utterance.rate = 0.95;
-    utterance.pitch = 1.0;
-    utterance.volume = 1.0;
-    
-    utterance.onstart = () => setIsAiSpeaking(true);
-    utterance.onend = () => setIsAiSpeaking(false);
-    utterance.onerror = () => setIsAiSpeaking(false);
-    
-    synthRef.current.speak(utterance);
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+
+    const cleanText = text.replace(/[*_#`~]/g, '').trim();
+
+    try {
+      const ttsUrl = `/api/interviews/tts/?text=${encodeURIComponent(cleanText)}`;
+      const audio = new Audio(ttsUrl);
+      audioRef.current = audio;
+      
+      setIsAiSpeaking(true);
+      
+      audio.onended = () => {
+        setIsAiSpeaking(false);
+        audioRef.current = null;
+      };
+      
+      audio.onerror = () => {
+        console.warn("Backend MP3 stream error, resorting to Web Speech API...");
+        fallbackSpeechSynth(cleanText);
+      };
+
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((err) => {
+          console.warn("Audio element play error:", err);
+          fallbackSpeechSynth(cleanText);
+        });
+      }
+    } catch (e) {
+      console.error(e);
+      fallbackSpeechSynth(cleanText);
+    }
+  };
+
+  const fallbackSpeechSynth = (text: string) => {
+    if (!('speechSynthesis' in window)) {
+      setIsAiSpeaking(false);
+      return;
+    }
+
+    try {
+      const synth = window.speechSynthesis;
+      synth.cancel();
+      if (synth.paused) synth.resume();
+
+      setTimeout(() => {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US';
+        
+        const voices = synth.getVoices();
+        if (voices && voices.length > 0) {
+          const preferredVoice = voices.find(v => 
+            v.lang.startsWith('en') && (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Samantha') || v.name.includes('Microsoft'))
+          ) || voices.find(v => v.lang.startsWith('en'));
+          if (preferredVoice) utterance.voice = preferredVoice;
+        }
+
+        utterance.rate = 0.95;
+        utterance.onstart = () => setIsAiSpeaking(true);
+        utterance.onend = () => setIsAiSpeaking(false);
+        utterance.onerror = () => setIsAiSpeaking(false);
+
+        synth.speak(utterance);
+      }, 50);
+    } catch {
+      setIsAiSpeaking(false);
+    }
   };
 
   const toggleRecording = () => {
@@ -185,15 +250,7 @@ export default function VoiceInterviewPage() {
       const res = await api.post(`/interviews/${id}/answer/`, { answer_text: answerText });
       
       // Show score toast
-      const eval_ = res.data.evaluation;
-      if (eval_?.score !== undefined) {
-        const score = eval_.score;
-        const color = score >= 7 ? '🟢' : score >= 5 ? '🟡' : '🔴';
-        toast(`${color} Score: ${score.toFixed(1)}/10`, {
-          description: eval_.feedback || '',
-          duration: 4000,
-        });
-      }
+      // Intermediate score recorded silently for final results page
 
       if (res.data.is_complete) {
         // Stop audio tracks
@@ -307,14 +364,27 @@ export default function VoiceInterviewPage() {
                 <p className="text-xl md:text-2xl font-medium leading-relaxed" style={{ color: 'var(--text-primary)' }}>
                   "{messages[messages.length - 1].content}"
                 </p>
-                {!isAiSpeaking && (
-                  <button
-                    onClick={() => speakText(messages[messages.length - 1].content)}
-                    className="mt-4 px-4 py-2 rounded-lg text-sm text-indigo-400 hover:bg-indigo-500/10 flex items-center gap-2 mx-auto"
-                  >
-                    <Play className="w-4 h-4" /> Play Audio
-                  </button>
-                )}
+                <button
+                  onClick={() => {
+                    if (isAiSpeaking) {
+                      window.speechSynthesis?.cancel();
+                      setIsAiSpeaking(false);
+                    } else {
+                      speakText(messages[messages.length - 1].content);
+                    }
+                  }}
+                  className="mt-4 px-4 py-2 rounded-xl text-sm font-medium border border-indigo-500/30 text-indigo-400 hover:bg-indigo-500/10 flex items-center gap-2 mx-auto transition-colors"
+                >
+                  {isAiSpeaking ? (
+                    <>
+                      <StopCircle className="w-4 h-4 text-red-400" /> Stop Audio
+                    </>
+                  ) : (
+                    <>
+                      <Volume2 className="w-4 h-4" /> Play Audio
+                    </>
+                  )}
+                </button>
               </motion.div>
             ) : transcript || messages[messages.length - 1]?.role === 'user' ? (
               <motion.div

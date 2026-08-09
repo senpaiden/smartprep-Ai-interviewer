@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, FileText, Sparkles, Loader2, AlertCircle, CheckCircle2, X, Star } from 'lucide-react';
+import { Upload, Sparkles, Loader2, AlertCircle, CheckCircle2, Star } from 'lucide-react';
 import api from '@/lib/api';
 import { toast } from 'sonner';
 import type { Resume } from '@/types';
@@ -14,18 +14,18 @@ export default function ResumeAnalyzerPage() {
 
   useEffect(() => {
     api.get('/resumes/').then((res) => {
-      setResumes(res.data.results || res.data);
-      if (res.data.results?.length || res.data?.length) {
-        const list = res.data.results || res.data;
-        const analyzed = list.find((r: Resume) => r.status === 'analyzed');
+      const list = Array.isArray(res.data) ? res.data : (res.data.results || []);
+      setResumes(list);
+      if (list.length > 0) {
+        const analyzed = list.find((r: Resume) => r.status === 'analyzed') || list[0];
         if (analyzed) setSelectedResume(analyzed);
       }
     }).catch(() => {});
   }, []);
 
   const handleUpload = useCallback(async (file: File) => {
-    if (!file.name.endsWith('.pdf')) {
-      toast.error('Only PDF files are allowed');
+    if (!file.name.endsWith('.pdf') && !file.name.endsWith('.txt')) {
+      toast.error('Please upload a PDF or TXT resume file');
       return;
     }
     setUploading(true);
@@ -47,7 +47,7 @@ export default function ResumeAnalyzerPage() {
       setResumes(prev => prev.map(r => r.id === newResume.id ? analysisRes.data : r));
       toast.success('Analysis complete!');
     } catch (err: any) {
-      toast.error(err.response?.data?.error || 'Upload failed');
+      toast.error(err.response?.data?.error || err.response?.data?.detail || 'Upload failed');
     } finally {
       setUploading(false);
       setAnalyzing(false);
@@ -64,10 +64,18 @@ export default function ResumeAnalyzerPage() {
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) handleUpload(file);
-    e.target.value = ''; // Reset input so same file can be uploaded again
+    e.target.value = '';
   };
 
   const r = selectedResume;
+  const techSkills = r?.technical_skills || [];
+  const softSkills = r?.soft_skills || [];
+  const projects = r?.projects || [];
+  const missingSkills = r?.missing_skills || [];
+  const grammarIssues = r?.grammar_issues || [];
+  const suggestions = r?.improvement_suggestions || [];
+  const atsScore = r?.ats_score ?? 75;
+  const rating = r?.resume_rating ?? 4.0;
 
   return (
     <div className="max-w-7xl mx-auto space-y-8">
@@ -86,7 +94,7 @@ export default function ResumeAnalyzerPage() {
           onDrop={handleDrop}
           onClick={() => document.getElementById('resume-input')?.click()}
         >
-          <input id="resume-input" type="file" accept=".pdf" className="hidden" onChange={handleFileInput} />
+          <input id="resume-input" type="file" accept=".pdf,.txt" className="hidden" onChange={handleFileInput} />
 
           {uploading || analyzing ? (
             <div className="flex flex-col items-center gap-3">
@@ -108,7 +116,7 @@ export default function ResumeAnalyzerPage() {
                   Drag & drop your resume here
                 </p>
                 <p className="text-xs mt-1 mb-4" style={{ color: 'var(--text-tertiary)' }}>
-                  PDF only, max 5MB
+                  PDF or TXT, max 5MB
                 </p>
                 <button 
                   type="button" 
@@ -145,14 +153,14 @@ export default function ResumeAnalyzerPage() {
                     <circle cx="50" cy="50" r="45" fill="none" stroke="var(--border)" strokeWidth="8" />
                     <circle
                       cx="50" cy="50" r="45" fill="none"
-                      stroke={r.ats_score >= 70 ? '#10b981' : r.ats_score >= 40 ? '#f59e0b' : '#ef4444'}
+                      stroke={atsScore >= 70 ? '#10b981' : atsScore >= 40 ? '#f59e0b' : '#ef4444'}
                       strokeWidth="8" strokeLinecap="round"
-                      strokeDasharray={`${(r.ats_score / 100) * 283} 283`}
+                      strokeDasharray={`${(atsScore / 100) * 283} 283`}
                       style={{ animation: 'score-fill 1.5s ease-out' }}
                     />
                   </svg>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{r.ats_score}</span>
+                    <span className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{atsScore}</span>
                   </div>
                 </div>
                 <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>ATS Score</p>
@@ -166,12 +174,12 @@ export default function ResumeAnalyzerPage() {
                     <Star
                       key={i}
                       className="w-7 h-7"
-                      fill={i <= Math.round(r.resume_rating) ? '#f59e0b' : 'transparent'}
-                      stroke={i <= Math.round(r.resume_rating) ? '#f59e0b' : 'var(--text-tertiary)'}
+                      fill={i <= Math.round(rating) ? '#f59e0b' : 'transparent'}
+                      stroke={i <= Math.round(rating) ? '#f59e0b' : 'var(--text-tertiary)'}
                     />
                   ))}
                 </div>
-                <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{r.resume_rating}/5</p>
+                <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{rating}/5</p>
                 <p className="text-sm font-semibold mt-1" style={{ color: 'var(--text-primary)' }}>Resume Rating</p>
               </div>
 
@@ -179,23 +187,23 @@ export default function ResumeAnalyzerPage() {
               <div className="glass-card p-6 space-y-3">
                 <div className="flex justify-between text-sm">
                   <span style={{ color: 'var(--text-secondary)' }}>Skills Found</span>
-                  <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>{r.technical_skills.length + r.soft_skills.length}</span>
+                  <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>{techSkills.length + softSkills.length}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span style={{ color: 'var(--text-secondary)' }}>Projects</span>
-                  <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>{r.projects.length}</span>
+                  <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>{projects.length}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span style={{ color: 'var(--text-secondary)' }}>Missing Skills</span>
-                  <span className="font-semibold text-amber-400">{r.missing_skills.length}</span>
+                  <span className="font-semibold text-amber-400">{missingSkills.length}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span style={{ color: 'var(--text-secondary)' }}>Grammar Issues</span>
-                  <span className="font-semibold text-red-400">{r.grammar_issues.length}</span>
+                  <span className="font-semibold text-red-400">{grammarIssues.length}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span style={{ color: 'var(--text-secondary)' }}>Suggestions</span>
-                  <span className="font-semibold text-cyan-400">{r.improvement_suggestions.length}</span>
+                  <span className="font-semibold text-cyan-400">{suggestions.length}</span>
                 </div>
               </div>
             </div>
@@ -207,11 +215,12 @@ export default function ResumeAnalyzerPage() {
                   <CheckCircle2 className="w-5 h-5 text-emerald-400" /> Technical Skills
                 </h3>
                 <div className="flex flex-wrap gap-2">
-                  {r.technical_skills.map((skill) => (
+                  {techSkills.map((skill) => (
                     <span key={skill} className="px-3 py-1.5 rounded-lg text-xs font-medium bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
                       {skill}
                     </span>
                   ))}
+                  {techSkills.length === 0 && <p className="text-xs text-slate-400">None detected</p>}
                 </div>
               </div>
 
@@ -220,23 +229,24 @@ export default function ResumeAnalyzerPage() {
                   <CheckCircle2 className="w-5 h-5 text-cyan-400" /> Soft Skills
                 </h3>
                 <div className="flex flex-wrap gap-2">
-                  {r.soft_skills.map((skill) => (
+                  {softSkills.map((skill) => (
                     <span key={skill} className="px-3 py-1.5 rounded-lg text-xs font-medium bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
                       {skill}
                     </span>
                   ))}
+                  {softSkills.length === 0 && <p className="text-xs text-slate-400">None detected</p>}
                 </div>
               </div>
             </div>
 
             {/* Issues & Suggestions */}
-            {r.improvement_suggestions.length > 0 && (
+            {suggestions.length > 0 && (
               <div className="glass-card p-6">
                 <h3 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
                   <Sparkles className="w-5 h-5 text-amber-400" /> Improvement Suggestions
                 </h3>
                 <div className="space-y-3">
-                  {r.improvement_suggestions.map((suggestion, i) => (
+                  {suggestions.map((suggestion, i) => (
                     <div key={i} className="flex gap-3 p-3 rounded-xl" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border)' }}>
                       <span className="text-amber-400 font-bold text-sm">{i + 1}.</span>
                       <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{suggestion}</p>
@@ -247,13 +257,13 @@ export default function ResumeAnalyzerPage() {
             )}
 
             {/* Missing Skills */}
-            {r.missing_skills.length > 0 && (
+            {missingSkills.length > 0 && (
               <div className="glass-card p-6">
                 <h3 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
                   <AlertCircle className="w-5 h-5 text-red-400" /> Missing Skills
                 </h3>
                 <div className="flex flex-wrap gap-2">
-                  {r.missing_skills.map((skill) => (
+                  {missingSkills.map((skill) => (
                     <span key={skill} className="px-3 py-1.5 rounded-lg text-xs font-medium bg-red-500/10 text-red-400 border border-red-500/20">
                       {skill}
                     </span>

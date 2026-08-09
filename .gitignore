@@ -3,6 +3,8 @@ node_modules/
 .venv/
 venv/
 env/
+server_fastapi/venv/
+client/node_modules/
 
 # Python
 __pycache__/
@@ -17,6 +19,9 @@ __pycache__/
 .env
 .env.local
 .env.*.local
+*.env
+server_fastapi/.env
+server_fastapi/.env.*
 server/.env
 server/.env.local
 server/.env.*.local
@@ -24,6 +29,7 @@ server/.env.*.local
 # Build
 dist/
 build/
+client/dist/
 *.tsbuildinfo
 
 # OS
@@ -44,22 +50,17 @@ yarn-debug.log*
 yarn-error.log*
 
 # Database
+*.sqlite
 *.sqlite3
 *.sqlite3-journal
+server_fastapi/db.sqlite3
 
-# Qdrant local data
+# Media uploads & local data
+server/media/
+server_fastapi/media/
 server/qdrant_data/
 
-# Media uploads
-server/media/
-
-# Coverage
-htmlcov/
-.coverage
-.coverage.*
-coverage/
-
-# Misc
+# Secrets & certs
 *.pem
 *.key
 *.cert

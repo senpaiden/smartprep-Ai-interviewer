@@ -37,6 +37,7 @@ export const useAuthStore = create<AuthState>()(
     {
       name: 'smart-interview-auth',
       partialize: (state) => ({
+        user: state.user,
         tokens: state.tokens,
         isAuthenticated: state.isAuthenticated,
       }),

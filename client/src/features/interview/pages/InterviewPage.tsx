@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Loader2, Clock, StopCircle, Brain, User, ChevronRight } from 'lucide-react';
+import { Send, Loader2, Clock, StopCircle, Brain, User, ChevronRight, Volume2 } from 'lucide-react';
 import api from '@/lib/api';
 import { toast } from 'sonner';
 import type { CurrentQuestion, AnswerEvaluation } from '@/types';
@@ -20,15 +20,66 @@ export default function InterviewPage() {
   const [answer, setAnswer] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
-  // Timer — countdown from duration
-  const [durationSeconds] = useState(() => {
-    const dur = parseInt(new URLSearchParams(window.location.search).get('duration') || '0');
-    return dur > 0 ? dur * 60 : 0;
-  });
-  const [timer, setTimer] = useState(0);
+  // Countdown timer in seconds
+  const [timerSeconds, setTimerSeconds] = useState<number | null>(null);
   const [timeUp, setTimeUp] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const speakText = (text: string) => {
+    if (!text) return;
+    
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+    
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+
+    const cleanText = text.replace(/[*_#`~]/g, '').trim();
+
+    try {
+      const ttsUrl = `/api/interviews/tts/?text=${encodeURIComponent(cleanText)}`;
+      const audio = new Audio(ttsUrl);
+      audioRef.current = audio;
+      
+      audio.onended = () => {
+        audioRef.current = null;
+      };
+      
+      audio.onerror = () => {
+        fallbackSpeechSynth(cleanText);
+      };
+
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          fallbackSpeechSynth(cleanText);
+        });
+      }
+    } catch {
+      fallbackSpeechSynth(cleanText);
+    }
+  };
+
+  const fallbackSpeechSynth = (text: string) => {
+    if (!('speechSynthesis' in window)) return;
+    try {
+      const synth = window.speechSynthesis;
+      synth.cancel();
+      if (synth.paused) synth.resume();
+      setTimeout(() => {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US';
+        synth.speak(utterance);
+      }, 50);
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   // Fetch interview and initial question
   useEffect(() => {
@@ -39,10 +90,9 @@ export default function InterviewPage() {
         return;
       }
 
-      // Set initial timer based on interview duration
-      if (interview.duration_minutes && !durationSeconds) {
-        setTimer(interview.duration_minutes * 60);
-      }
+      // Initialize countdown timer based on session duration_minutes
+      const durationMins = interview.duration_minutes || 30;
+      setTimerSeconds(durationMins * 60);
 
       // Reconstruct chat from existing Q&As
       const msgs: ChatMessage[] = [];
@@ -67,25 +117,21 @@ export default function InterviewPage() {
     }).catch(() => toast.error('Failed to load interview'));
   }, [id, navigate]);
 
-  // Timer — count up (or down if duration set)
+  // Timer — countdown every second
   useEffect(() => {
-    if (isComplete || timeUp) return;
+    if (isComplete || timeUp || timerSeconds === null) return;
     const interval = setInterval(() => {
-      if (durationSeconds > 0) {
-        setTimer(t => {
-          if (t <= 1) {
-            setTimeUp(true);
-            clearInterval(interval);
-            return 0;
-          }
-          return t - 1;
-        });
-      } else {
-        setTimer(t => t + 1);
-      }
+      setTimerSeconds(t => {
+        if (t === null || t <= 1) {
+          setTimeUp(true);
+          clearInterval(interval);
+          return 0;
+        }
+        return t - 1;
+      });
     }, 1000);
     return () => clearInterval(interval);
-  }, [isComplete, timeUp, durationSeconds]);
+  }, [isComplete, timeUp, timerSeconds !== null]);
 
   // Auto-end when time is up
   useEffect(() => {
@@ -187,8 +233,8 @@ export default function InterviewPage() {
           <div className="flex items-center gap-2 px-4 py-2 rounded-xl glass-card">
             <Clock className={`w-4 h-4 ${timeUp ? 'text-red-400' : 'text-indigo-400'}`} />
             <span className={`text-sm font-mono font-semibold ${timeUp ? 'text-red-400' : ''}`} style={{ color: timeUp ? undefined : 'var(--text-primary)' }}>
-              {formatTime(timer)}
-              {durationSeconds > 0 && <span className="text-xs ml-1 opacity-60">remaining</span>}
+              {formatTime(timerSeconds ?? 0)}
+              <span className="text-xs ml-1 opacity-60">remaining</span>
             </span>
           </div>
 
@@ -254,7 +300,18 @@ export default function InterviewPage() {
                       color: msg.role === 'ai' ? 'var(--text-primary)' : '#fff',
                     }}
                   >
-                    {msg.content}
+                    <div className="flex items-start justify-between gap-3">
+                      <span className="flex-1">{msg.content}</span>
+                      {msg.role === 'ai' && (
+                        <button
+                          onClick={() => speakText(msg.content)}
+                          title="Listen to question"
+                          className="p-1.5 rounded-lg text-indigo-400 hover:bg-indigo-500/10 shrink-0 transition-colors"
+                        >
+                          <Volume2 className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 )}
 

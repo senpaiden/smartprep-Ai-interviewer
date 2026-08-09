@@ -38,8 +38,7 @@ api.interceptors.response.use(
           originalRequest.headers.Authorization = `Bearer ${newAccess}`;
           return api(originalRequest);
         } catch {
-          useAuthStore.getState().logout();
-          window.location.href = '/login';
+          // Keep session intact as guest
         }
       }
     }
