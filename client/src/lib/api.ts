@@ -1,10 +1,15 @@
 import axios from 'axios';
 import { useAuthStore } from '@/stores/authStore';
 
+const API_BASE = import.meta.env.VITE_API_URL || (
+  window.location.hostname === 'localhost' ? '/api' : 'https://smartprep-ai-interviewer.onrender.com/api'
+);
+
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: API_BASE,
   headers: { 'Content-Type': 'application/json' },
 });
+
 
 // Request interceptor — attach JWT
 api.interceptors.request.use((config) => {
@@ -27,7 +32,8 @@ api.interceptors.response.use(
       const refresh = useAuthStore.getState().tokens?.refresh;
       if (refresh) {
         try {
-          const res = await axios.post('/api/auth/refresh/', { refresh });
+          const res = await axios.post(`${API_BASE}/auth/refresh/`, { refresh });
+
           const newAccess = res.data.access;
 
           useAuthStore.getState().setTokens({
