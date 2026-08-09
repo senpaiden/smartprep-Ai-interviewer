@@ -45,22 +45,52 @@ class QdrantVectorService:
         except Exception as e:
             logger.error(f"Failed to initialize Qdrant vector store: {e}")
 
-    def search_curriculum(self, query: str, top_k: int = 3) -> List[Dict[str, Any]]:
+    def search_curriculum(self, query: str, top_k: int = 2, question_number: int = 1, exclude_days: List[int] = None) -> List[Dict[str, Any]]:
         """
-        Simulates HNSW dense vector cosine similarity search across indexed curriculum embeddings.
+        Simulates HNSW dense vector cosine similarity search across indexed curriculum embeddings,
+        ensuring diverse multi-day curriculum coverage across interview turns.
         """
-        query_words = set(query.lower().split())
+        exclude = set(exclude_days or [])
+        query_words = set(w for w in query.lower().split() if len(w) > 2)
         scored_results = []
 
+        # Target dynamic day ranges based on question number if excluded or no query match
+        day_ranges = {
+            1: range(1, 6),
+            2: range(6, 11),
+            3: range(11, 16),
+            4: range(16, 21),
+            5: range(21, 26),
+            6: range(26, 32),
+            7: range(1, 16),
+            8: range(16, 32),
+        }
+        preferred_range = day_ranges.get(question_number, range(1, 32))
+
         for item in self.vectors:
+            day = item["day"]
+            if day in exclude:
+                continue
+
             text_words = set(item["text"].split())
             intersection = query_words.intersection(text_words)
-            score = len(intersection) / max(len(query_words), 1)
+            match_score = len(intersection) / max(len(query_words), 1)
 
-            scored_results.append((score, item))
+            # Boost score if the day falls within target question number module phase
+            phase_boost = 0.5 if day in preferred_range else 0.0
+            total_score = match_score + phase_boost
+
+            scored_results.append((total_score, item))
 
         scored_results.sort(key=lambda x: x[0], reverse=True)
-        return [res[1] for res in scored_results[:top_k]]
+        results = [res[1] for res in scored_results[:top_k]]
+
+        # Fallback if all excluded
+        if not results:
+            candidates = [item for item in self.vectors if item["day"] not in exclude]
+            results = candidates[:top_k] if candidates else self.vectors[:top_k]
+
+        return results
 
     def get_uncovered_curriculum_days(self, completed_days: List[int], count: int = 4) -> List[Dict[str, Any]]:
         """
@@ -70,6 +100,7 @@ class QdrantVectorService:
         if len(uncovered) < count:
             return [item for item in self.vectors[:count]]
         return uncovered[:count]
+
 
 # Global instance
 qdrant_service = QdrantVectorService()

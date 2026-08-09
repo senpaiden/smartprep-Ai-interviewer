@@ -1,9 +1,8 @@
 import axios from 'axios';
 import { useAuthStore } from '@/stores/authStore';
 
-const API_BASE = import.meta.env.VITE_API_URL || (
-  window.location.hostname === 'localhost' ? '/api' : 'https://smartprep-ai-interviewer.onrender.com/api'
-);
+const API_BASE = import.meta.env.VITE_API_URL || 'https://smartprep-ai-interviewer.onrender.com/api';
+
 
 const api = axios.create({
   baseURL: API_BASE,

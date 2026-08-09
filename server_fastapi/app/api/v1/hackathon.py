@@ -171,16 +171,25 @@ async def handle_hackathon_interview(
     candidate_info = sess_data.get("candidate", {})
     candidate_name = candidate_info.get("member", {}).get("name", "Candidate") if isinstance(candidate_info, dict) else "Candidate"
     
+    # Collect already covered days
+    previous_days = [q.get("day") for q in questions if isinstance(q, dict) and q.get("day")]
+    
     # Qdrant Vector Search over 31-Day AI Cohort Curriculum
-    retrieved_docs = qdrant_service.search_curriculum(user_message or "RAG vector search prompt engineering", top_k=2)
+    retrieved_docs = qdrant_service.search_curriculum(
+        query=user_message or "RAG vector search prompt engineering",
+        top_k=2,
+        question_number=next_q_num,
+        exclude_days=previous_days
+    )
     retrieved_text = "\n".join([f"Day {doc['day']}: {doc['topic']} - {doc['module']}" for doc in retrieved_docs])
     
     curriculum_ctx = {
         "candidate_name": candidate_name,
         "candidate_role": candidate_info.get("member", {}).get("jobRole", "AI Engineer"),
         "retrieved_curriculum": retrieved_text,
-        "covered_days": [doc['day'] for doc in retrieved_docs]
+        "covered_days": previous_days + [doc['day'] for doc in retrieved_docs]
     }
+
 
     next_question = ai_service.generate_interview_question(
         interview_type="hackathon_cohort",

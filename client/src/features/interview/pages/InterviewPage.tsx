@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Loader2, Clock, StopCircle, Brain, User, ChevronRight, Volume2 } from 'lucide-react';
+import { Send, Loader2, Clock, StopCircle, Brain, User, ChevronRight, Volume2, Home, LayoutDashboard } from 'lucide-react';
+
 import api from '@/lib/api';
 import { toast } from 'sonner';
 import type { CurrentQuestion, AnswerEvaluation } from '@/types';
@@ -230,6 +231,24 @@ export default function InterviewPage() {
         </div>
 
         <div className="flex items-center gap-3">
+          <button
+            onClick={() => navigate('/')}
+            className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold glass-card hover:bg-white/10 transition-all text-slate-200 cursor-pointer"
+            title="Homepage"
+          >
+            <Home className="w-4 h-4 text-cyan-400" />
+            <span className="hidden sm:inline">Home</span>
+          </button>
+
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold glass-card hover:bg-white/10 transition-all text-slate-200 cursor-pointer"
+            title="Main Dashboard"
+          >
+            <LayoutDashboard className="w-4 h-4 text-indigo-400" />
+            <span className="hidden sm:inline">Dashboard</span>
+          </button>
+
           <div className="flex items-center gap-2 px-4 py-2 rounded-xl glass-card">
             <Clock className={`w-4 h-4 ${timeUp ? 'text-red-400' : 'text-indigo-400'}`} />
             <span className={`text-sm font-mono font-semibold ${timeUp ? 'text-red-400' : ''}`} style={{ color: timeUp ? undefined : 'var(--text-primary)' }}>
@@ -260,11 +279,12 @@ export default function InterviewPage() {
           <button
             onClick={handleEnd}
             className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium
-              bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors"
+              bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors cursor-pointer"
           >
             <StopCircle className="w-4 h-4" /> End
           </button>
         </div>
+
       </div>
 
       {/* Chat Area */}

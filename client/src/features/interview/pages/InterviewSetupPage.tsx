@@ -5,11 +5,12 @@ import {
   Code2, Brain, Layout, Server, Cloud, Database, BarChart3,
   Palette, Smartphone, Shield, Briefcase, Cpu,
   Settings, Loader2, Sparkles, Mic, FileText, ChevronRight,
-  User, AlertTriangle,
+  User, AlertTriangle, Home, LayoutDashboard,
 } from 'lucide-react';
 import api from '@/lib/api';
 import { toast } from 'sonner';
 import type { InterviewType, Difficulty, InterviewRole, CandidateProfile } from '@/types';
+
 
 interface RoleOption {
   id: InterviewRole;
@@ -108,10 +109,29 @@ export default function InterviewSetupPage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>New Interview</h1>
-        <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>Choose your interview mode and get started</p>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>New Interview</h1>
+          <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>Choose your interview mode and get started</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => navigate('/')}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold glass-card hover:bg-white/10 transition-all text-slate-200 cursor-pointer"
+          >
+            <Home className="w-4 h-4 text-cyan-400" />
+            Home
+          </button>
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold glass-card hover:bg-white/10 transition-all text-slate-200 cursor-pointer"
+          >
+            <LayoutDashboard className="w-4 h-4 text-indigo-400" />
+            Dashboard
+          </button>
+        </div>
       </motion.div>
+
 
       {/* Mode Toggle */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>

@@ -169,7 +169,18 @@
     background: rgba(59, 130, 246, 0.3);
     color: #f1f5f9;
   }
+
+  select option {
+    background-color: #18181b !important;
+    color: #f4f4f5 !important;
+  }
+
+  html.light select option {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+  }
 }
+
 
 .glass-card {
   background: var(--card);
