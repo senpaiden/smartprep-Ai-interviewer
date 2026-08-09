@@ -1,0 +1,54 @@
+{
+  "program": "31-Day AI Cohort",
+  "curriculum": [
+    {
+      "day": 1,
+      "topic": "Retrieval-Augmented Generation (RAG) Architecture",
+      "module": "RAG Core",
+      "learning_objectives": ["Understand Naive RAG vs Advanced RAG", "Chunking strategies", "Context retrieval pipelines"],
+      "tools": ["LangChain", "LlamaIndex"]
+    },
+    {
+      "day": 4,
+      "topic": "Vector Databases & Dense Embeddings",
+      "module": "Vector Search",
+      "learning_objectives": ["Cosine similarity vs Euclidean distance", "HNSW Indexing", "Qdrant Vector DB implementation"],
+      "tools": ["Qdrant", "Sentence-Transformers"]
+    },
+    {
+      "day": 9,
+      "topic": "Prompt Engineering & System Directives",
+      "module": "LLM Steering",
+      "learning_objectives": ["Few-shot prompting", "Chain of Thought (CoT)", "Negative constraints"],
+      "tools": ["OpenAI API", "Groq API"]
+    },
+    {
+      "day": 15,
+      "topic": "Agentic AI & Multi-Tool Orchestration",
+      "module": "Autonomous Agents",
+      "learning_objectives": ["ReAct loop (Reason + Act)", "Tool selection & function calling", "Agent state management"],
+      "tools": ["LangGraph", "CrewAI"]
+    },
+    {
+      "day": 20,
+      "topic": "Model Context Protocol (MCP)",
+      "module": "Agent Infrastructure",
+      "learning_objectives": ["MCP Server/Client specifications", "Tool declarations", "Resource & prompt abstractions"],
+      "tools": ["FastMCP", "MCP SDK"]
+    },
+    {
+      "day": 26,
+      "topic": "AI Deployment & Low-Latency Serving",
+      "module": "Production AI",
+      "learning_objectives": ["Quantization (INT8/FP16)", "ONNX Runtime execution", "Streaming REST/gRPC endpoints"],
+      "tools": ["FastAPI", "ONNX Runtime", "vLLM"]
+    },
+    {
+      "day": 31,
+      "topic": "Production AI Systems & Governance",
+      "module": "Enterprise AI",
+      "learning_objectives": ["LLM Evaluation metrics (BLEU, ROUGE, G-Eval)", "Hallucination guardrails", "Cost optimization"],
+      "tools": ["TruLens", "Ragas"]
+    }
+  ]
+}

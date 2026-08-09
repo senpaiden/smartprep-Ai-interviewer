@@ -1,0 +1,29 @@
+[
+  {
+    "candidate_id": "cand_001",
+    "name": "Aakash Yaduwanshi",
+    "track": "AI Systems & RAG Engineering",
+    "completed_missions": [1, 4, 9, 15, 20, 26, 31],
+    "skipped_topics": [],
+    "learning_signals": ["Strong understanding of vector indexing and HNSW", "Proficient in FastAPI async endpoints"],
+    "attempts": 12
+  },
+  {
+    "candidate_id": "cand_002",
+    "name": "Krrish Yaduka",
+    "track": "Agentic AI & MCP Architecture",
+    "completed_missions": [1, 4, 9, 15, 20],
+    "skipped_topics": [26],
+    "learning_signals": ["Excellent tool selection in ReAct loops", "Needs practice with ONNX quantization"],
+    "attempts": 8
+  },
+  {
+    "candidate_id": "cand_003",
+    "name": "Ali Ahmad Raza Sheikh",
+    "track": "Full-Stack AI Engineering",
+    "completed_missions": [1, 4, 9, 20, 26],
+    "skipped_topics": [15],
+    "learning_signals": ["Solid frontend state synchronization", "Good grasp of JWT security and CORS"],
+    "attempts": 10
+  }
+]
