@@ -1,313 +1,95 @@
-# Interview Agent
+# 🚀 SmartPrep AI — AI Technical Interviewer & Resume Analyzer
 
-An AI-powered technical interview platform that simulates real interview scenarios with adaptive questioning, voice interaction, and comprehensive performance analytics.
-
----
-
-## Problem Statement
-
-Technical interviews are stressful, inconsistent, and inaccessible. Candidates lack a way to practice realistic interviews with adaptive questioning. Interviewers spend hours on repetitive screening. Existing platforms offer static question banks that don't adapt to the candidate's responses or track growth over time.
-
-**Key problems:**
-- No personalized interview experience that adapts to your skill level
-- No real-time feedback on communication, confidence, and technical accuracy
-- No structured way to track interview performance across sessions
-- No curriculum-aligned preparation for AI/ML cohort candidates
+SmartPrep is an AI-powered technical interview platform designed to simulate real-world technical interviews with adaptive AI questioning, speech interaction, resume ATS analysis, and real-time performance analytics.
 
 ---
 
-## Solution
+## 🌟 Key Features
 
-Interview Agent provides AI-driven mock interviews that adapt in real-time based on candidate responses. The platform evaluates answers across 10 dimensions (technical accuracy, confidence, communication, English fluency, grammar, vocabulary, fluency, relevance, completeness, problem-solving) and generates detailed performance reports.
-
-**Core features:**
-- **Role-Based Interviews** — 12 pre-configured roles (Full Stack, AI/ML, Frontend, Backend, DevOps, etc.)
-- **Curriculum-Based Interviews** — 31-day AI cohort curriculum with Qdrant RAG for targeted preparation
-- **Voice Interviews** — Real-time speech-to-text (Groq Whisper) and text-to-speech
-- **AI Evaluation** — 10-dimension scoring with strengths/weaknesses analysis
-- **Coding Challenges** — In-browser code editor with Judge0 integration and AI code review
-- **Company-Specific Prep** — Upload company documents for RAG-powered contextual questions
-- **Resume Analysis** — ATS scoring and interview question generation from uploaded resumes
-- **Performance Tracking** — Dashboard, leaderboards, certificates, and roadmap generation
+* **⚡ Zero-Friction Persona Access**: Instant access by providing your Name, Username, and Email. No complex passwords or account registration steps required.
+* **🗣️ Voice & Text Mock Interviews**: Speak or type your answers naturally using Speech-to-Text (Groq Whisper) and Text-to-Speech integration.
+* **📄 AI Resume ATS Analyzer**: Upload resumes (PDF) for immediate ATS scoring, skill extraction, and candidate match reasons.
+* **📊 Skill Radar & Dashboard**: Track performance across Technical Accuracy, Communication, Confidence, Problem Solving, and Grammar.
+* **🗺️ Interactive Learning Roadmap**: Personalized preparation cards broken down into day-by-day learning milestones.
+* **📱 Mobile-First Responsive Design**: Optimized UI featuring a top navigation bar, bottom action tabs, and slide-up drawer for mobile devices.
 
 ---
 
-## Tech Stack
+## 🛠️ Tech Stack
 
-### Backend
+### Backend (`server_fastapi`)
 | Technology | Purpose |
 |------------|---------|
-| Django 4.2 | Web framework |
-| Django REST Framework | API layer |
-| PostgreSQL (Neon) | Primary database |
-| Qdrant | Vector database for RAG |
-| NVIDIA LLaMA 3.1 70B | Question generation, summaries |
-| NVIDIA LLaMA 3.1 8B | Fast inference (evaluation, resume analysis) |
-| Groq Whisper | Speech-to-text |
-| PyJWT | Authentication |
+| **FastAPI** | High-performance Python Async Web Framework |
+| **SQLAlchemy 2.0 + asyncpg** | Async ORM & PostgreSQL Database driver |
+| **Pydantic V2** | Request validation & setting management |
+| **Groq Llama 3.3 70B & 8B** | Real-time question generation & candidate evaluation |
+| **PyPDF** | Async PDF resume parsing |
+| **PyJWT + Passlib** | JWT authentication engine |
 
-### Frontend
+### Frontend (`client`)
 | Technology | Purpose |
 |------------|---------|
-| React 18 | UI framework |
-| Vite | Build tool |
-| TypeScript | Type safety |
-| Zustand | State management |
-| React Router | Client-side routing |
-| Tailwind CSS | Styling |
-| React Query | Server state |
-| Lucide React | Icons |
-
-### Infrastructure
-| Technology | Purpose |
-|------------|---------|
-| Neon PostgreSQL | Serverless Postgres |
-| Qdrant Cloud | Vector search |
-| Vercel/Netlify | Frontend deployment |
-| Render/Railway | Backend deployment |
+| **React 18 + Vite** | Fast SPA UI framework & bundler |
+| **TypeScript** | Type-safe state management |
+| **TailwindCSS** | Custom dark-mode responsive design system |
+| **Zustand** | Auth & UI state management |
+| **React Query (TanStack)** | Async server state caching & automatic refetching |
+| **Lucide React** | Modern iconography |
 
 ---
 
-## Prerequisites
+## 🚀 Quick Start Guide
 
-- **Node.js** 18+ and npm
-- **Python** 3.9+
-- **pip** (Python package manager)
-- **Git**
+### Prerequisites
+* **Node.js**: v18+
+* **Python**: v3.10+
+* **Git**
 
----
-
-## Installation
-
-### 1. Clone the repository
-
+### 1. Clone & Set Up Backend
 ```bash
-git clone https://github.com/yourusername/interview-agent.git
-cd interview-agent
-```
+cd server_fastapi
 
-### 2. Backend setup
-
-```bash
-cd server
-
-# Create virtual environment
+# Create & activate virtual environment
 python3 -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
 
-# Set up environment variables
-cp .env.example .env
-# Edit .env with your API keys (see Environment Variables below)
-
-# Run migrations
-python manage.py migrate
-
-# Create superuser (optional)
-python manage.py createsuperuser
-
-# Start development server
-python manage.py runserver
+# Run FastAPI development server
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
+*FastAPI interactive docs available at: `http://localhost:8000/docs`*
 
-Backend runs at `http://localhost:8000`
-
-### 3. Frontend setup
-
+### 2. Set Up Frontend
 ```bash
 cd client
 
-# Install dependencies
+# Install packages
 npm install
 
-# Start development server
+# Start Vite dev server
 npm run dev
 ```
-
-Frontend runs at `http://localhost:5173`
-
-### 4. Seed data (optional)
-
-```bash
-cd server
-python manage.py shell < seed_companies.py
-```
+*App will open at: `http://localhost:5173`*
 
 ---
 
-## Environment Variables
-
-Create a `.env` file in the `server/` directory:
-
-```env
-# Database (Neon PostgreSQL)
-DATABASE_URL=postgresql://user:password@host/database?sslmode=require
-
-# AI Services
-NVIDIA_API_KEY=your_nvidia_api_key
-GROQ_API_KEY=your_groq_api_key
-
-# Vector Database (Qdrant)
-QDRANT_API_KEY=your_qdrant_api_key
-QDRANT_URL=https://your-cluster.qdrant.io:6333
-
-# Authentication
-SECRET_KEY=your_django_secret_key
-JWT_ACCESS_TOKEN_LIFETIME_MINUTES=60
-JWT_REFRESH_TOKEN_LIFETIME_DAYS=7
-
-# Frontend
-FRONTEND_URL=http://localhost:5173
-
-# Email (optional)
-EMAIL_HOST_USER=your_email@gmail.com
-EMAIL_HOST_PASSWORD=your_app_password
-```
-
-**Never commit `.env` to version control.**
-
----
-
-## API Endpoints
-
-### Authentication
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/auth/register/` | Create account |
-| POST | `/api/auth/login/` | Login (returns JWT) |
-| POST | `/api/auth/refresh/` | Refresh access token |
-| POST | `/api/auth/forgot-password/` | Request password reset |
-| POST | `/api/auth/reset-password/` | Reset password |
-| POST | `/api/auth/change-password/` | Change password |
-
-### Interviews
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/interviews/me/` | List user's interviews |
-| POST | `/api/interviews/start/` | Start new interview |
-| POST | `/api/interviews/submit-answer/` | Submit answer + get evaluation |
-| POST | `/api/interviews/:id/complete/` | Complete interview |
-| GET | `/api/interviews/stats/` | Interview statistics |
-| GET | `/api/interviews/certificates/` | List certificates |
-
-### Resume
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/resumes/upload/` | Upload resume (PDF) |
-| GET | `/api/resumes/` | List resumes |
-| GET | `/api/resumes/:id/analysis/` | Get ATS analysis |
-
-### Coding
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/coding/challenges/` | List challenges |
-| POST | `/api/coding/challenges/:id/submit/` | Submit code solution |
-
-### Companies
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/interviews/companies/` | List companies |
-| POST | `/api/interviews/companies/:id/documents/` | Upload knowledge doc |
-| POST | `/api/interviews/companies/:id/query/` | Query company knowledge |
-
-### Hackathon (No Auth)
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/interview/sessions/` | List hackathon sessions |
-| POST | `/api/interview/start/` | Start hackathon interview |
-| POST | `/api/interview/submit/` | Submit answer |
-
----
-
-## Project Structure
-
-```
-interview-agent/
-├── client/                     # React frontend
-│   ├── src/
-│   │   ├── features/           # Feature modules
-│   │   │   ├── auth/           # Login, register
-│   │   │   ├── dashboard/      # Main dashboard
-│   │   │   ├── interview/      # Interview flow
-│   │   │   ├── coding/         # Code editor
-│   │   │   ├── resume/         # Resume upload
-│   │   │   ├── certificates/   # View certificates
-│   │   │   ├── leaderboard/    # Rankings
-│   │   │   ├── roadmap/        # Learning path
-│   │   │   ├── hackathon/      # Hackathon mode
-│   │   │   └── companies/      # Company interviews
-│   │   ├── stores/             # Zustand stores
-│   │   ├── components/         # Shared components
-│   │   └── lib/                # API client, utils
-│   └── public/                 # Static assets
-├── server/                     # Django backend
-│   ├── accounts/               # Auth, users
-│   ├── interviews/             # Interview logic, companies
-│   ├── resumes/                # Resume upload, analysis
-│   ├── ai_service/             # LLM integration
-│   ├── coding/                 # Code challenges
-│   ├── notifications/          # User notifications
-│   ├── hackathon/              # Hackathon interview mode
-│   ├── hackathon_data/         # Candidates, curriculum JSON
-│   ├── core/                   # Settings, URLs
-│   └── qdrant_data/            # Local Qdrant storage
-├── company_scrapers/           # Job description scrapers
-└── guidelines/                 # Project guidelines
-```
-
----
-
-## Running Tests
-
-```bash
-# Backend tests
-cd server
-python manage.py test
-
-# Frontend type check
-cd client
-npx tsc --noEmit
-```
-
----
-
-## Deployment
+## 🌐 Production Deployment
 
 ### Backend (Render)
-1. Connect GitHub repo
-2. Set build command: `pip install -r requirements.txt`
-3. Set start command: `gunicorn core.wsgi:application`
-4. Add environment variables
+* **Root Directory**: `server_fastapi`
+* **Build Command**: `pip install -r requirements.txt`
+* **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
 
 ### Frontend (Vercel)
-1. Connect GitHub repo
-2. Framework: Vite
-3. Build command: `npm run build`
-4. Output directory: `dist`
+* **Root Directory**: `client`
+* **Framework Preset**: Vite
+* **Build Command**: `npm run build`
+* **Output Directory**: `dist`
 
 ---
 
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing`)
-5. Open a Pull Request
-
----
-
-## License
-
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
-
----
-
-## Acknowledgments
-
-- NVIDIA for LLaMA API access
-- Groq for speech-to-text
-- Qdrant for vector search
-- Neon for serverless PostgreSQL
+## 📄 License
+Licensed under the [MIT License](LICENSE).
