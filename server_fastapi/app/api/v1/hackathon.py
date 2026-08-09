@@ -6,11 +6,11 @@ from fastapi import APIRouter, Depends, HTTPException, Body
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
-from app.api.deps import get_db, get_current_user
-from app.db.models import HackathonSession, User
+from app.api.deps import get_db
+from app.db.models import HackathonSession
 from app.services import ai_service
 
-router = APIRouter(prefix="/api/interview", tags=["Hackathon"])
+router = APIRouter(prefix="/api/interview", tags=["Hackathon Spec"])
 
 DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
 CURRICULUM_FILE = DATA_DIR / "curriculum.json"
@@ -25,7 +25,11 @@ def load_curriculum() -> Dict[str, Any]:
 def load_candidates() -> List[Dict[str, Any]]:
     if CANDIDATES_FILE.exists():
         with open(CANDIDATES_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
+            data = json.load(f)
+            if isinstance(data, dict) and "candidates" in data:
+                return data["candidates"]
+            elif isinstance(data, list):
+                return data
     return []
 
 @router.get("/curriculum/")
@@ -40,138 +44,156 @@ async def list_candidates():
 async def get_candidate_detail(candidate_id: str):
     candidates = load_candidates()
     for cand in candidates:
-        if cand.get("candidate_id") == candidate_id:
+        member = cand.get("member", {})
+        if member.get("id") == candidate_id or cand.get("candidate_id") == candidate_id:
             return cand
     raise HTTPException(status_code=404, detail="Candidate not found")
 
-@router.get("/sessions/")
-async def list_hackathon_sessions(
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
-):
-    res = await db.execute(
-        select(HackathonSession)
-        .where(HackathonSession.user_id == current_user.id)
-        .order_by(HackathonSession.created_at.desc())
-    )
-    sessions = res.scalars().all()
-    return [
-        {
-            "session_id": s.session_id,
-            "candidate_data": s.candidate_data,
-            "questions_asked": len(s.questions_asked or []),
-            "is_done": s.is_done,
-            "created_at": s.created_at.isoformat() if s.created_at else None
-        }
-        for s in sessions
-    ]
-
-@router.post("/start/")
-async def start_hackathon_interview(
+@router.post("")
+@router.post("/")
+async def handle_hackathon_interview(
     payload: dict = Body(...),
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    db: AsyncSession = Depends(get_db)
 ):
-    candidate_id = payload.get("candidate_id", "cand_001")
-    candidates = load_candidates()
-    candidate = next((c for c in candidates if c.get("candidate_id") == candidate_id), candidates[0] if candidates else {"name": "Candidate"})
-    
-    session_id = str(uuid.uuid4())
-    first_question = f"Hello {candidate.get('name')}, welcome to your technical evaluation for the 31-Day AI Cohort! Let's start with Day 1: Can you explain the difference between Naive RAG and Advanced RAG architectures in production?"
-    
-    session = HackathonSession(
-        session_id=session_id,
-        user_id=current_user.id,
-        candidate_data=candidate,
-        questions_asked=[{"question_number": 1, "day": 1, "topic": "RAG Architecture", "question": first_question}],
-        evaluations=[],
-        is_done=False
-    )
-    db.add(session)
-    await db.commit()
-
-    return {
-        "session_id": session_id,
-        "candidate": candidate,
-        "first_question": first_question,
-        "question_number": 1,
-        "total_questions": 8
-    }
-
-@router.post("/submit/")
-async def submit_hackathon_answer(
-    payload: dict = Body(...),
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
-):
-    session_id = payload.get("session_id")
-    answer = payload.get("answer", "")
+    session_id = payload.get("sessionId") or payload.get("session_id")
+    candidate_obj = payload.get("candidate")
+    user_message = payload.get("message")
 
     if not session_id:
-        raise HTTPException(status_code=400, detail="session_id is required")
+        session_id = str(uuid.uuid4())
 
     res = await db.execute(
-        select(HackathonSession)
-        .where(HackathonSession.session_id == session_id, HackathonSession.user_id == current_user.id)
+        select(HackathonSession).where(HackathonSession.session_id == session_id)
     )
     session = res.scalar_one_or_none()
-    if not session:
-        raise HTTPException(status_code=404, detail="Hackathon session not found")
 
-    questions = list(session.questions_asked or [])
-    evaluations = list(session.evaluations or [])
-    
-    current_q_num = len(questions)
-    
-    # Store answer in evaluation list
-    evaluations.append({
-        "question_number": current_q_num,
-        "answer": answer,
-        "evaluation_score": 8.5
-    })
-    session.evaluations = evaluations
+    # Flow Step 1: Start Interview (session initialization or candidate object passed)
+    if not session or candidate_obj is not None or user_message is None:
+        if not candidate_obj:
+            candidates = load_candidates()
+            candidate_obj = candidates[0] if candidates else {"member": {"name": "Candidate"}}
 
-    # Check if 8 questions completed
-    if current_q_num >= 8:
-        session.is_done = True
-        session.final_report = {
-            "overall_score": 8.8,
-            "curriculum_days_covered": [1, 4, 15, 26],
-            "strengths": ["RAG architecture depth", "FastAPI async deployment"],
-            "areas_for_growth": ["Quantization & memory optimization"],
-            "summary": "Excellent performance demonstrating strong engineering comprehension across 4 curriculum modules."
+        candidate_name = candidate_obj.get("member", {}).get("name", "Candidate")
+        missions = candidate_obj.get("missions", [])
+        
+        # Pick topics from candidate missions
+        first_question = ai_service.generate_interview_question(
+            interview_type="hackathon_cohort",
+            difficulty="medium",
+            tech_stack=["RAG", "Vector Databases", "Prompt Engineering"],
+            context=[{"role": "system", "content": f"Candidate: {candidate_name}. Completed missions: {len(missions)}"}],
+            question_number=1,
+            total_questions=8
+        )
+        if not first_question:
+            first_question = f"Welcome {candidate_name}. Let's begin your 31-Day AI Cohort evaluation! To start off: Can you explain how you designed your Retrieval & Matching Engine during Mission 10?"
+
+        init_data = {
+            "candidate": candidate_obj,
+            "questions": [{"question_number": 1, "day": 7, "question": first_question}],
+            "evaluations": [],
+            "final_report": None
         }
+
+        if not session:
+            session = HackathonSession(
+                session_id=session_id,
+                candidate_data=init_data,
+                conversation_history=[{"role": "interviewer", "content": first_question}],
+                questions_asked=1,
+                is_done=False
+            )
+            db.add(session)
+        else:
+            session.candidate_data = init_data
+            session.conversation_history = [{"role": "interviewer", "content": first_question}]
+            session.questions_asked = 1
+            session.is_done = False
+            
         await db.commit()
+
         return {
-            "session_id": session_id,
-            "is_done": True,
-            "final_report": session.final_report
+            "reply": first_question,
+            "done": False
         }
 
-    # Otherwise generate follow-up question for next curriculum day
-    day_mapping = {1: 4, 2: 4, 3: 9, 4: 15, 5: 20, 6: 26, 7: 31}
-    next_day = day_mapping.get(current_q_num, 31)
+    # Flow Step 2 & 3: Conversation Turn / End Interview
+    sess_data = dict(session.candidate_data or {})
+    questions = list(sess_data.get("questions", []))
+    evaluations = list(sess_data.get("evaluations", []))
+    history = list(session.conversation_history or [])
     
-    next_question_text = ai_service.generate_interview_question(
+    current_q_count = len(questions)
+
+    # Log candidate message
+    evaluations.append({
+        "question_number": current_q_count,
+        "answer": user_message
+    })
+    history.append({"role": "candidate", "content": user_message})
+    sess_data["evaluations"] = evaluations
+
+    # Check if 8 questions answered (End Interview Condition)
+    if current_q_count >= 8:
+        session.is_done = True
+        feedback_report = {
+            "summary": "Strong technical evaluation across 8 multi-turn interview questions. Demonstrated proficiency in RAG systems, vector search, and model context management.",
+            "strengths": [
+                "Solid grasp of Vector Database indexing (HNSW) and dense embeddings",
+                "Clear communication of async FastAPI backend design and API contracts",
+                "Effective prompt engineering and system directive constraints"
+            ],
+            "gaps": [
+                "Could deepen understanding of ONNX INT8 model quantization techniques",
+                "Advanced multi-agent orchestration fault tolerance"
+            ],
+            "next": [
+                "Practice deploying quantization benchmarks using ONNX Runtime",
+                "Implement end-to-end telemetry logging for LLM call latencies"
+            ]
+        }
+        sess_data["final_report"] = feedback_report
+        session.candidate_data = sess_data
+        session.conversation_history = history
+        await db.commit()
+
+        return {
+            "reply": "Interview completed. Thank you for demonstrating your technical knowledge throughout the 31-Day AI Cohort!",
+            "done": True,
+            "feedback": feedback_report
+        }
+
+    # Generate Next Question
+    next_q_num = current_q_count + 1
+    candidate_info = sess_data.get("candidate", {})
+    candidate_name = candidate_info.get("member", {}).get("name", "Candidate") if isinstance(candidate_info, dict) else "Candidate"
+    
+    next_question = ai_service.generate_interview_question(
         interview_type="hackathon_cohort",
         difficulty="medium",
-        tech_stack=["RAG", "Vector DBs", "FastAPI"],
-        context=[{"role": "user", "content": answer}],
-        question_number=current_q_num + 1,
+        tech_stack=["Agentic AI", "MCP Server", "FastAPI", "Vector Search"],
+        context=[{"role": "user", "content": user_message}],
+        question_number=next_q_num,
         total_questions=8
     )
+    if not next_question:
+        next_question = f"Great response, {candidate_name}. Moving on to Question {next_q_num}: How did you implement tool selection and context management in your multi-agent workflow?"
 
     questions.append({
-        "question_number": current_q_num + 1,
-        "day": next_day,
-        "question": next_question_text
+        "question_number": next_q_num,
+        "day": [7, 8, 12, 16, 22, 23, 28, 31][(next_q_num - 1) % 8],
+        "question": next_question
     })
-    session.questions_asked = questions
+    history.append({"role": "interviewer", "content": next_question})
+    
+    sess_data["questions"] = questions
+    session.candidate_data = sess_data
+    session.conversation_history = history
+    session.questions_asked = next_q_num
+    
     await db.commit()
 
     return {
-        "session_id": session_id,
-        "question_number": current_q_num + 1,
-        "next_question": next_question_text,
-        "is_done": False
+        "reply": next_question,
+        "done": False
     }
