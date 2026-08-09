@@ -60,6 +60,36 @@ async def list_user_interviews(
         for i in interviews
     ]
 
+@router.get("/candidates/")
+async def list_interview_candidates():
+    from pathlib import Path
+    data_file = Path(__file__).resolve().parent.parent.parent / "data" / "candidates.json"
+    if not data_file.exists():
+        return {"candidates": []}
+    
+    with open(data_file, "r", encoding="utf-8") as f:
+        raw_data = json.load(f)
+        candidate_list = raw_data.get("candidates", []) if isinstance(raw_data, dict) else raw_data
+
+    results = []
+    for c in candidate_list:
+        member = c.get("member", {})
+        missions = c.get("missions", [])
+        skipped = [m.get("title", "") for m in missions if m.get("skipped") or not m.get("passed", True)]
+        
+        results.append({
+            "id": member.get("id", str(uuid.uuid4())),
+            "name": member.get("name", "Candidate"),
+            "jobRole": member.get("jobRole", "AI Cohort Student"),
+            "yearsExperience": member.get("yearsExperience", 1),
+            "education": member.get("education", "Computer Science"),
+            "missionsCount": len(missions),
+            "weak_topics": skipped if skipped else ["Advanced Quantization Optimization"]
+        })
+        
+    return {"candidates": results}
+
+
 @router.post("/start/", status_code=status.HTTP_201_CREATED)
 async def start_interview(
     data: StartInterviewRequest,
