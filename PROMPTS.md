@@ -1,10 +1,10 @@
-# Vibe-Coding Verification & AI Usage Log (`PROMPTS.md`)
+# 🚀 Vibe-Coding Verification & AI Usage Log (`PROMPTS.md`)
 
-This document verifies that this project was built and iterated upon using agentic AI workflows (vibe-coding). It details the prompt sequences, design refinements, and critical bug fixes implemented by the AI.
+This document verifies that **SmartPrep AI** was built and iterated upon using agentic AI workflows (vibe-coding) for the **Token Tossers** hackathon entry (*The Interview Agent*). It details the prompt sequences, design refinements, architecture migrations, and critical bug fixes implemented by the AI.
 
 ---
 
-## 1. Landing Page Redesign (GSAP & Three.js WebGL)
+## 1. Landing Page & Design Architecture
 
 ### Prompt 1: Initial Premium Design Setup
 > **User:** "The landing page looks very simple, and the design is not there like 3-D animations, so make the landing page more premium and include every sections like hero, header, CTA, FAQ, features etc."
@@ -16,47 +16,66 @@ This document verifies that this project was built and iterated upon using agent
 - Implemented `FeatureGrid.jsx` using a customized 3D tilt card hover effect.
 - Created `InteractiveRoadmap.jsx` with staggered scroll-triggered animations.
 
-### Prompt 2: Content Strategy Expansion
+### Prompt 2: Content Strategy & Palette Refresh
 > **User:** "Design the landing page to a premium product. there should be all sections like hero, header, CTA, FAQ, Features, a clear USP, problem statement, proposed solution and keep all animations"
 
 **AI Action:**
-- Added the following components to the landing page narrative flow:
-  - `ProblemStatement.jsx`: A dark, cinematic section revealing technical interview pain points with staggered fade-ins.
-  - `ProposedSolution.jsx`: Explaining how the AI agent functions as an empathetic, data-driven interviewer.
-  - `UniqueSellingProposition.jsx`: Establishing the core differentiator ("The Only Platform That Actually Listens").
-- Wired all sections into `/client/src/features/landing/pages/LandingPage.tsx`.
-
-### Prompt 3: Styling and Palette Refresh
-> **User:** "See the landing page and tell me what design you can change. I don't like the colour."
-
-**AI Action:**
-- Transitioned the entire site's theme from tech-blue to **Cyber Obsidian & Neon Teal**.
-- Configured CSS variables in `index.css` for a rich Obsidian dark background (`#09090b`) and primary Neon Teal accent (`#06b6d4`).
-- Updated inline styles, Tailwind color highlights, and the WebGL canvas material colors to synchronize with the new palette.
+- Transitioned theme to **Cyber Obsidian & Neon Teal** (`#09090b` obsidian background with `#06b6d4` neon accents).
+- Configured CSS variables in `index.css` for dark-mode consistency across desktop and mobile.
 
 ---
 
-## 2. Hackathon Implementation Debugging
+## 2. Technical Specification & Hackathon Requirements
 
-### Prompt 4: Bug Squashing
-> **User:** "see this status : [Status report containing B1-B9]"
+### Prompt 3: Technical Spec Alignment
+> **User:** "The interview should assess candidate understanding, adapt naturally, ask follow-up questions, maintain context across 8 questions covering 4 curriculum days."
 
 **AI Action:**
-- **B1 (Route Mismatch):** Fixed client API calls in `HackathonChatPage.tsx` and `HackathonHistoryPage.tsx` to point to `/api/interview/...` instead of `/api/hackathon/...`.
-- **B2 (Auth Bypassing):** Replaced `@permission_classes([IsAuthenticated])` with `AllowAny` on all session and candidate endpoints to make them public as per spec. Handled anonymous session filtering.
-- **B3 & B7 (Question Counting & LLM Guards):** Added strict prompts ensuring only a single question is asked per turn. Moved the incrementing logic inside the successful try-block so error fallbacks do not consume question turns.
-- **B5 (History Binding):** Updated Django view deserialization to query the nested path `session.candidate_data.get('member', {}).get('name')` to match the JSON schema.
-- **B6 (Failed Missions):** Programmed the AI coordinator to dynamically flag failed cohort missions (`passed: false`).
-- **B4 & B9 (Curriculum Day Coverage):** Implemented Qdrant query filters to search specifically for days that have not yet been queried in the current session.
+- Created Qdrant vector database query filters to search specifically for unqueried curriculum days.
+- Enforced 8-question minimum lifecycle with structured score evaluations at completion.
+- Built Hackathon API routing supporting unauthenticated candidate evaluation workflows.
 
 ---
 
-## 3. Backend Test Suite Verification
+## 3. FastAPI Migration & Async Engine
 
-### Prompt 5: Test Harness Cleanup
-> **User:** "test the backend fully"
+### Prompt 4: High-Performance Async Architecture
+> **User:** "Migrate the backend logic to FastAPI with async database handling and modern schemas."
 
 **AI Action:**
-- Discovered that standalone execution scripts (`test_interview.py` and `test_resume.py`) were being incorrectly imported by Django's test runner, throwing `ValueError` and `ImportError` on DB queries during testing.
-- Wrapped script bodies inside `if __name__ == '__main__':` blocks, allowing Django unit tests to run and pass cleanly.
-- Successfully verified that all **50 unit tests** pass cleanly with exit code 0 (`OK`).
+- Built `server_fastapi` engine powered by FastAPI, SQLAlchemy 2.0 (`asyncpg` / `aiosqlite`), Pydantic V2 schemas, and PyJWT.
+- Configured Groq Llama 3.3 70B & NVIDIA Llama 3.1 8B LLM service bindings.
+- Created `render.yaml` for 1-click Render web service deployment.
+
+---
+
+## 4. Mobile Navigation & Feature Pruning
+
+### Prompt 5: Mobile UX Optimization & Feature Cleanup
+> **User:** "remove leaderboard, company sets, fix ui issues in ai roadmap, make ui responsive for phones, add burger buttons/drawer instead of sidebar, and delete dead code."
+
+**AI Action:**
+- Refactored `AppLayout.tsx` and `Sidebar.tsx` to introduce a responsive mobile top navbar, bottom action bar, and slide-up drawer menu.
+- Pruned deprecated modules (`coding`, `leaderboard`, `profile`) to streamline mobile navigation and reduce bundle size.
+- Verified TypeScript compilation and Vite production build (`npm run build`).
+
+---
+
+## 5. Zero-Friction Auth & Account Isolation
+
+### Prompt 6: Fast Persona Access & User Isolation Fix
+> **User:** "revert changes and add a login page where user has just to add email and account details like name and username with no password creation so we have an authorized persona. Also fix account data showing across profiles."
+
+**AI Action:**
+- Created `/api/auth/quick-login/` endpoint in FastAPI that auto-provisions or retrieves database personas using Name, Username, and Email.
+- Updated `LoginPage.tsx` with a single-step entry form.
+- Fixed `users.py` dashboard stats to remove static mock fallback scores (`84/100`, `85%`), guaranteeing strict user data isolation.
+- Implemented full client cache clearing on login (`window.location.href = '/dashboard'`).
+
+---
+
+## 📄 Team Information
+* **Team Name**: Token Tossers
+* **Project Title**: SmartPrep AI — The Interview Agent
+* **Members**: Aakash Yaduwanshi, Krrish Yaduka, Ali Ahmad Raza Sheikh
+* **Repository**: [https://github.com/senpaiden/smartprep-Ai-interviewer.git](https://github.com/senpaiden/smartprep-Ai-interviewer.git)
