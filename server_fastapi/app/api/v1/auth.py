@@ -12,7 +12,8 @@ from app.schemas.auth import (
     RegisterRequest, LoginRequest, TokenResponse, RefreshTokenRequest, ForgotPasswordRequest, QuickLoginRequest
 )
 
-router = APIRouter(prefix="/api/auth", tags=["Auth"])
+router = APIRouter(prefix="/auth", tags=["Auth"])
+
 
 @router.post("/register/", status_code=status.HTTP_201_CREATED)
 async def register(data: RegisterRequest, db: AsyncSession = Depends(get_db)):
