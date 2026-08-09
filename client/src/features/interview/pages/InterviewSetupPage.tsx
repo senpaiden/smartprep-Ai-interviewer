@@ -5,7 +5,7 @@ import {
   Code2, Brain, Layout, Server, Cloud, Database, BarChart3,
   Palette, Smartphone, Shield, Briefcase, Cpu,
   Settings, Loader2, Sparkles, Mic, FileText, ChevronRight,
-  User, AlertTriangle, Home, LayoutDashboard,
+  User, AlertTriangle, Home, LayoutDashboard, Check,
 } from 'lucide-react';
 import api from '@/lib/api';
 import { toast } from 'sonner';
@@ -221,10 +221,22 @@ export default function InterviewSetupPage() {
               <button
                 key={role.id}
                 onClick={() => setSelectedRole(role)}
-                className={`glass-card p-5 text-left transition-all hover:scale-[1.02] ${
-                  selectedRole?.id === role.id ? 'ring-2 ring-indigo-500' : ''
+                aria-pressed={selectedRole?.id === role.id}
+                className={`glass-card relative overflow-hidden p-5 text-left transition-all duration-200 hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 ${
+                  selectedRole?.id === role.id
+                    ? 'ring-2 ring-indigo-400 shadow-[0_0_28px_rgba(99,102,241,0.22)]'
+                    : 'hover:border-indigo-400/40'
                 }`}
+                style={selectedRole?.id === role.id ? {
+                  background: 'linear-gradient(135deg, rgba(99,102,241,0.24), rgba(139,92,246,0.10))',
+                } : undefined}
               >
+                {selectedRole?.id === role.id && (
+                  <span className="absolute right-3 top-3 flex items-center gap-1.5 rounded-full bg-indigo-500 px-2.5 py-1 text-[11px] font-bold text-white shadow-lg">
+                    <Check className="h-3.5 w-3.5" strokeWidth={3} />
+                    Selected
+                  </span>
+                )}
                 <div
                   className="w-10 h-10 rounded-xl flex items-center justify-center mb-3"
                   style={{ background: `${role.color}15` }}
