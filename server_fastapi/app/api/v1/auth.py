@@ -174,8 +174,10 @@ async def refresh_token(data: RefreshTokenRequest, db: AsyncSession = Depends(ge
 async def forgot_password(data: ForgotPasswordRequest, db: AsyncSession = Depends(get_db)):
     return {"message": "If an account with that email exists, a reset link has been sent."}
 
+@router.post("/quick-login")
 @router.post("/quick-login/")
 async def quick_login(data: QuickLoginRequest, db: AsyncSession = Depends(get_db)):
+
     res = await db.execute(select(User).where(User.email == data.email))
     user = res.scalar_one_or_none()
 
