@@ -6,7 +6,8 @@ from sqlalchemy import select, update, func
 from app.api.deps import get_db, get_current_user
 from app.db.models import Notification, User
 
-router = APIRouter(prefix="/api/notifications", tags=["Notifications"])
+router = APIRouter(prefix="/notifications", tags=["Notifications"])
+
 
 @router.get("/")
 async def list_notifications(

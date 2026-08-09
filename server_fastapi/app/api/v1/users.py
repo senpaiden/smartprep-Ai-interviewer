@@ -7,7 +7,8 @@ from app.api.deps import get_db, get_current_user, get_current_admin
 from app.db.models import User, Profile, Interview, HackathonSession, Resume
 from app.schemas.user import UserSchema, UserUpdateSchema, ProfileSchema
 
-router = APIRouter(prefix="/api/users", tags=["Users"])
+router = APIRouter(prefix="/users", tags=["Users"])
+
 
 @router.get("/me/")
 async def get_me(current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):

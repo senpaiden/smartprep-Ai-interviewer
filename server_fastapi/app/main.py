@@ -48,7 +48,7 @@ app.include_router(users_router, prefix="/api")
 app.include_router(interviews_router, prefix="/api")
 app.include_router(resumes_router, prefix="/api")
 app.include_router(notifications_router, prefix="/api")
-app.include_router(hackathon_router)
+app.include_router(hackathon_router, prefix="/api")
 
 # Direct fallback mounts (Without /api prefix)
 app.include_router(auth_router)
@@ -56,6 +56,8 @@ app.include_router(users_router)
 app.include_router(interviews_router)
 app.include_router(resumes_router)
 app.include_router(notifications_router)
+app.include_router(hackathon_router)
+
 
 
 

@@ -15,7 +15,8 @@ from app.db.models import Interview, InterviewQuestion, InterviewAnswer, Company
 from app.services import ai_service
 
 logger = logging.getLogger(__name__)
-router = APIRouter(prefix="/api/interviews", tags=["Interviews"])
+router = APIRouter(prefix="/interviews", tags=["Interviews"])
+
 
 class StartInterviewRequest(BaseModel):
     interview_type: str = "technical"

@@ -11,7 +11,8 @@ from app.api.deps import get_db, get_current_user
 from app.db.models import Resume, User
 from app.services import ai_service
 
-router = APIRouter(prefix="/api/resumes", tags=["Resumes"])
+router = APIRouter(prefix="/resumes", tags=["Resumes"])
+
 
 MEDIA_DIR = Path(__file__).resolve().parent.parent.parent.parent / "media" / "resumes"
 MEDIA_DIR.mkdir(parents=True, exist_ok=True)

@@ -12,7 +12,8 @@ from app.services import ai_service
 from app.services.qdrant_service import qdrant_service
 
 
-router = APIRouter(prefix="/api/interview", tags=["Hackathon Spec"])
+router = APIRouter(prefix="/interview", tags=["Hackathon Spec"])
+
 
 DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
 CURRICULUM_FILE = DATA_DIR / "curriculum.json"
